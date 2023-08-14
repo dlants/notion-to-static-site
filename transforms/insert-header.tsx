@@ -15,6 +15,9 @@ export function transformHeader(
             <a href={page.newPath}>{page.title}</a>
           </div>
         ))}
+        <div className="">
+          <a href="https://buttondown.email/dlants">email signup</a>
+        </div>
       </div>,
     ),
   );
