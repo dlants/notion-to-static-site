@@ -9,6 +9,19 @@ export async function* walk(dir: string): AsyncGenerator<string> {
   }
 }
 
+export function relativeToAbsoluteUrl({
+  relativeUrl,
+  pageDir,
+}: {
+  relativeUrl: string;
+  pageDir: string;
+}) {
+  if (pageDir == "static/export") {
+    return relativeUrl;
+  }
+  return encodeURI(pageDir.slice("static/export/".length)) + "/" + relativeUrl;
+}
+
 export type PageInfo = {
   title: string;
   originalPath: string;
@@ -20,3 +33,13 @@ export type PageInfo = {
 export type UrlMap = {
   [originalUrl: string]: string;
 };
+
+export function generateUrlMap(pages: PageInfo[]) {
+  const urlMap: UrlMap = {};
+  for (const page of pages) {
+    urlMap[encodeURI(page.originalPath.replace(/^static\/export\//, ""))] =
+      encodeURIComponent(page.newPath);
+  }
+
+  return urlMap;
+}

@@ -1,6 +1,6 @@
 import * as yargs from "yargs";
 import { $ } from "zx";
-import { PageInfo, UrlMap } from "./util";
+import { PageInfo, UrlMap, generateUrlMap } from "./util";
 import * as cheerio from "cheerio";
 import * as fs from "fs";
 import * as path from "path";
@@ -105,21 +105,15 @@ yargs
       // into the pages array first. This is our index page.
       const homePage = pages[0];
       homePage.newPath = "index.html";
-      const urlMap: UrlMap = {};
-
-      for (const page of pages) {
-        urlMap[page.originalPath] = page.newPath;
-      }
 
       for (const page of pages) {
         console.log(`processing ${page.originalPath}`);
         const $ = cheerio.load(fs.readFileSync(page.originalPath));
 
+        transformLinks({ $, urlMap: generateUrlMap(pages), page });
         transformHeader($, sectionpages);
-        transformLinks($, urlMap);
 
         const outPath = path.join("static/dist", page.newPath);
-        fs.mkdirSync(path.dirname(outPath), { recursive: true });
         fs.writeFileSync(outPath, $.html());
         console.log(`wrote ${outPath}`);
       }
