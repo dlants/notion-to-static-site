@@ -1,6 +1,6 @@
 import * as yargs from "yargs";
 import { $ } from "zx";
-import { AssetInfo, PageInfo, UrlMap, generateUrlMap } from "./util";
+import { AssetInfo, PageInfo, generateUrlMap } from "./util";
 import * as cheerio from "cheerio";
 import * as fs from "fs";
 import * as path from "path";
@@ -8,6 +8,7 @@ import express from "express";
 import { transformHeader } from "./transforms/insert-header";
 import _ from "lodash";
 import { transformLinks } from "./transforms/links";
+import { rewriteAbsoluteUrls } from "./transforms/download-images";
 
 yargs
   .command(
@@ -134,7 +135,8 @@ yargs
         console.log(`processing ${page.originalPath}`);
         const $ = cheerio.load(fs.readFileSync(page.originalPath));
 
-        transformLinks({ $, urlMap: generateUrlMap({pages, assets}), page });
+        transformLinks({ $, urlMap: generateUrlMap({ pages, assets }), page });
+        await rewriteAbsoluteUrls({ $ });
         transformHeader($, sectionpages);
 
         const outPath = path.join("static/dist", page.newPath);

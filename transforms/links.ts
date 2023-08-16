@@ -29,5 +29,4 @@ export function transformLinks({
       $(i).attr("src", urlMap[src]);
     }
   });
-
 }
