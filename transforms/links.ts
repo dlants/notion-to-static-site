@@ -15,10 +15,19 @@ export function transformLinks({
       relativeUrl: a.attribs.href,
       pageDir: page.dir,
     });
-    debugger;
     if (urlMap[href]) {
       $(a).attr("href", urlMap[href]);
-      console.log(`remapped ${href} to ${urlMap[href]}`);
     }
   });
+
+  $("img").each((_, i) => {
+    const src = relativeToAbsoluteUrl({
+      relativeUrl: i.attribs.src,
+      pageDir: page.dir,
+    });
+    if (urlMap[src]) {
+      $(i).attr("src", urlMap[src]);
+    }
+  });
+
 }

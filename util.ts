@@ -30,15 +30,33 @@ export type PageInfo = {
   assetDir: string;
 };
 
+export type AssetInfo = {
+  originalPath: string;
+  newPath: string;
+  basename: string;
+  dir: string;
+};
+
 export type UrlMap = {
   [originalUrl: string]: string;
 };
 
-export function generateUrlMap(pages: PageInfo[]) {
+export function generateUrlMap({
+  pages,
+  assets,
+}: {
+  pages: PageInfo[];
+  assets: AssetInfo[];
+}) {
   const urlMap: UrlMap = {};
   for (const page of pages) {
     urlMap[encodeURI(page.originalPath.replace(/^static\/export\//, ""))] =
       encodeURIComponent(page.newPath);
+  }
+
+  for (const asset of assets) {
+    urlMap[encodeURI(asset.originalPath.replace(/^static\/export\//, ""))] =
+      encodeURIComponent(asset.newPath);
   }
 
   return urlMap;
