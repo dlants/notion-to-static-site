@@ -35,5 +35,5 @@ add #naviation links to each title / subtitle
 check the build results into the repo, set up render to mirror repo to website
 
 ## MAYBE
-consider using the notion api to fetch pages / blocks, rather than relying on manual export of html
+consider using the notion api to fetch pages / blocks, rather than relying on manual export of html. Possibly use https://github.com/kerwanp/notion-render
 name asset files by content hash
