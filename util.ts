@@ -31,7 +31,7 @@ export type PageInfo = {
   breadcrumbs: Breadcrumb[];
   title: string;
   originalPath: string;
-  newPath: string;
+  pageUrl: string;
   dir: string;
   assetDir: string;
 };
@@ -57,7 +57,7 @@ export function generateUrlMap({
   const urlMap: UrlMap = {};
   for (const page of pages) {
     urlMap[encodeURI(page.originalPath.replace(/^static\/export\//, ""))] =
-      encodeURIComponent(page.newPath);
+      encodeURIComponent(page.pageUrl);
   }
 
   for (const asset of assets) {

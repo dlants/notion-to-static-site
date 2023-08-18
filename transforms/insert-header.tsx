@@ -46,14 +46,14 @@ export function insertHeader({
           ))}
           <div className={css.breadcrumb}>
             {" > "}
-            <a href={page.newPath}>{page.title}</a>
+            <a href={page.pageUrl}>{page.title}</a>
           </div>
         </div>
 
         <div className={css.sectionsContainer}>
           {sectionPages.map((page) => (
             <div className={css.section}>
-              <a href={page.newPath}>{page.title}</a>
+              <a href={page.pageUrl}>{page.title}</a>
             </div>
           ))}
           <div className={css.subscribe}>

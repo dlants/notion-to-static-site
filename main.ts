@@ -61,7 +61,7 @@ yargs
         await rewriteAbsoluteUrls({ $ });
         insertHeader({ $, page, sectionPages });
 
-        const outPath = path.join("static/dist", page.newPath);
+        const outPath = path.join("static/dist", page.pageUrl);
         fs.writeFileSync(outPath, $.html());
         console.log(`wrote ${outPath}`);
       }
@@ -103,19 +103,19 @@ async function walkProject() {
         if (/\.html$/.test(entPath)) {
           const $ = cheerio.load(fs.readFileSync(entPath));
           const title = $(".page-title").text();
-          let newPath;
+          let pageUrl;
           let index = 0;
           while (true) {
-            newPath = title + (index == 0 ? "" : `(${index})`) + ".html";
-            if (!existingPaths.has(newPath)) {
-              existingPaths.add(newPath);
+            pageUrl = title + (index == 0 ? "" : `(${index})`) + ".html";
+            if (!existingPaths.has(pageUrl)) {
+              existingPaths.add(pageUrl);
               break;
             }
           }
 
           const page: PageInfo = {
             originalPath: entPath,
-            newPath,
+            pageUrl,
             title,
             dir: dirPath,
             breadcrumbs,
@@ -124,7 +124,7 @@ async function walkProject() {
           // we list the export directory first. It should only have a single page inside of it, which will be inserted
           // into the pages array first. This is our index page.
           if (pages.length == 0) {
-            page.newPath = "index.html";
+            page.pageUrl = "index.html";
           }
 
           pages.push(page);
@@ -143,7 +143,7 @@ async function walkProject() {
                 ...breadcrumbs,
                 {
                   title,
-                  url: page.newPath,
+                  url: page.pageUrl,
                 },
               ],
             });
