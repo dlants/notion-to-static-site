@@ -22,7 +22,13 @@ export function relativeToAbsoluteUrl({
   return encodeURI(pageDir.slice("static/export/".length)) + "/" + relativeUrl;
 }
 
+export type Breadcrumb = {
+  title: string;
+  url: string;
+};
+
 export type PageInfo = {
+  breadcrumbs: Breadcrumb[];
   title: string;
   originalPath: string;
   newPath: string;
