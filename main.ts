@@ -76,9 +76,6 @@ yargs
   .help().argv;
 
 async function walkProject() {
-  // TODO:
-  //    generate rss for each section
-  //    fixup embeds (video, collapsible sections, etc...)
   const pages: PageInfo[] = [];
   const assets: AssetInfo[] = [];
   const sectionpages: PageInfo[] = [];
@@ -102,20 +99,15 @@ async function walkProject() {
       if (ent.isFile()) {
         if (/\.html$/.test(entPath)) {
           const $ = cheerio.load(fs.readFileSync(entPath));
-          const title = $(".page-title").text();
-          let pageUrl;
-          let index = 0;
-          while (true) {
-            pageUrl = title + (index == 0 ? "" : `(${index})`) + ".html";
-            if (!existingPaths.has(pageUrl)) {
-              existingPaths.add(pageUrl);
-              break;
-            }
+          const pageId = $("article").attr("id");
+          if (!pageId) {
+            throw new Error(`Could not identify pageId for ppath ${entPath}`);
           }
-
+          const title = $(".page-title").text();
           const page: PageInfo = {
+            id: pageId,
             originalPath: entPath,
-            pageUrl,
+            pageUrl: pageId.replace(/-/g, "") + ".html",
             title,
             dir: dirPath,
             breadcrumbs,

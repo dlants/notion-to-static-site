@@ -28,6 +28,7 @@ export type Breadcrumb = {
 };
 
 export type PageInfo = {
+  id: string;
   breadcrumbs: Breadcrumb[];
   title: string;
   originalPath: string;

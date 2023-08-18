@@ -6,6 +6,7 @@ style page, header
 media queries for mobile styling
 favicon
 update pageUrls to use pageIds / hashes, to make links more permanent (so they don't change if the page gets renamed)
+keep asset files between renders, so we don't have to re-download them
 generate rss files for each section
 fixup embeds (video, collapsible sections, etc...)
 add automatic "next post / previous post" links for multiple pages in the same section
@@ -14,3 +15,4 @@ check the build results into the repo, set up render to mirror repo to website
 
 ## MAYBE
 consider using the notion api to fetch pages / blocks, rather than relying on manual export of html
+name asset files by content hash
