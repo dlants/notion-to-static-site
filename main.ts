@@ -9,6 +9,7 @@ import { insertHeader } from "./transforms/insert-header";
 import _ from "lodash";
 import { transformLinks } from "./transforms/links";
 import { rewriteAbsoluteUrls } from "./transforms/download-images";
+import { youtubeEmbed } from "./transforms/youtube";
 
 yargs
   .command(
@@ -57,6 +58,7 @@ yargs
         console.log(`processing ${page.originalPath}`);
         const $ = cheerio.load(fs.readFileSync(page.originalPath));
 
+        youtubeEmbed({$, page, sectionPages});
         transformLinks({ $, urlMap: generateUrlMap({ pages, assets }), page });
         await rewriteAbsoluteUrls({ $ });
         insertHeader({ $, page, sectionPages });
