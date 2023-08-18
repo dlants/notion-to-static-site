@@ -78,8 +78,6 @@ yargs
 async function walkProject() {
   // TODO:
   //    generate rss for each section
-  //    remap internal urls to new locations
-  //    download all linked assets, remap image urls
   //    fixup embeds (video, collapsible sections, etc...)
   const pages: PageInfo[] = [];
   const assets: AssetInfo[] = [];
