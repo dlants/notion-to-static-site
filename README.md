@@ -1,5 +1,26 @@
 # notion-to-static-site
-Convert your public notion page into a collection of static files.
+A hackable site generator for your notion pages.
+
+# Usage
+Go to a Notion page, and export it as HTML. Make sure you include all content and subpages, and create folders for
+subpages.
+
+Place the results into `static/export`
+
+Run:
+```
+npm install
+npx tsx main.ts build
+npx tsx main.ts serve
+```
+
+Navigate to `localhost:1337`. You'll be able to see your site! The static html is placed into `static/dist`, with
+`index.html` as the main entry point. You can then do with it as you like, like hook it up to render, or upload it
+to github pages.
+
+# Hack it
+Should be easy enough to follow. The `main.ts` file has the main build command. It walks `static/export/` to generate
+a list of pages, then applies transforms in `transforms/` to each page.
 
 ## TODO
 style page, header
