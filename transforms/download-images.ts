@@ -24,6 +24,9 @@ export async function downloadFile(
 }
 
 export async function rewriteAbsoluteUrls({ $ }: { $: CheerioAPI }) {
+  const urlMap: {
+    [originalUrl: string]: string;
+  } = {};
   await Promise.all(
     $("img").map(async (_, i) => {
       const src = i.attribs.src;
@@ -35,6 +38,17 @@ export async function rewriteAbsoluteUrls({ $ }: { $: CheerioAPI }) {
         console.log(`downloading ${src} to ${outPath}`);
         await downloadFile(src, outPath);
         $(i).attr("src", encodeURIComponent(fileName));
+        urlMap[src] = encodeURIComponent(fileName);
+      }
+    }),
+  );
+
+  // images are nested inside a elements that link to the image
+  await Promise.all(
+    $("a").map(async (_, a) => {
+      const href = a.attribs.href;
+      if (urlMap[href]) {
+        $(a).attr("href", urlMap[href]);
       }
     }),
   );
