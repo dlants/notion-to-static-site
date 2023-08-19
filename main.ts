@@ -18,7 +18,7 @@ import { preDownloadAssets } from "./transforms/download-images";
 import { youtubeEmbed } from "./transforms/youtube";
 import { insertFavicon } from "./transforms/insert-favicon";
 import dotenv from "dotenv";
-import { fetchPage } from "./fetch-page";
+import { NotionClientWrapper } from "./fetch-page";
 dotenv.config();
 
 yargs
@@ -56,12 +56,12 @@ yargs
     "fetch",
     "query the notion api for updates to the page",
     {},
-    async (argv) => {
+    async (_argv) => {
       const NOTION_API_TOKEN = ensureEnvironmentVariable("NOTION_API_TOKEN");
       const ROOT_PAGE_ID = ensureEnvironmentVariable("ROOT_PAGE_ID");
+      const client = new NotionClientWrapper(NOTION_API_TOKEN);
 
-      await fetchPage({
-        notionApiToken: NOTION_API_TOKEN,
+      await client.fetchPageAndChildren({
         pageId: ROOT_PAGE_ID,
       });
     },
