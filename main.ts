@@ -10,6 +10,7 @@ import _ from "lodash";
 import { transformLinks } from "./transforms/links";
 import { preDownloadAssets } from "./transforms/download-images";
 import { youtubeEmbed } from "./transforms/youtube";
+import { insertFavicon } from "./transforms/insert-favicon";
 
 yargs
   .command(
@@ -56,6 +57,7 @@ yargs
       // output directory
       // await $`rm -rf static/dist`;
       await $`mkdir -p static/dist`;
+      await $`cp -f static/manual/* static/dist`
 
       const { pages, assets, sectionPages } = await walkProject();
 
@@ -67,6 +69,7 @@ yargs
         transformLinks({ $, urlMap: generateUrlMap({ pages, assets }), page });
         await preDownloadAssets({ $, forceDownload: argv.forceDownload });
         insertHeader({ $, page, sectionPages });
+        insertFavicon({ $, page, sectionPages });
 
         const outPath = path.join("static/dist", page.pageUrl);
         fs.writeFileSync(outPath, $.html());
