@@ -1,6 +1,12 @@
 import * as yargs from "yargs";
 import { $ } from "zx";
-import { AssetInfo, Breadcrumb, PageInfo, generateUrlMap } from "./util";
+import {
+  AssetInfo,
+  Breadcrumb,
+  PageInfo,
+  ensureEnvironmentVariable,
+  generateUrlMap,
+} from "./util";
 import * as cheerio from "cheerio";
 import * as fs from "fs";
 import * as path from "path";
@@ -11,6 +17,9 @@ import { transformLinks } from "./transforms/links";
 import { preDownloadAssets } from "./transforms/download-images";
 import { youtubeEmbed } from "./transforms/youtube";
 import { insertFavicon } from "./transforms/insert-favicon";
+import dotenv from "dotenv";
+import { fetchPage } from "./fetch-page";
+dotenv.config();
 
 yargs
   .command(
@@ -44,6 +53,20 @@ yargs
     },
   )
   .command(
+    "fetch",
+    "query the notion api for updates to the page",
+    {},
+    async (argv) => {
+      const NOTION_API_TOKEN = ensureEnvironmentVariable("NOTION_API_TOKEN");
+      const ROOT_PAGE_ID = ensureEnvironmentVariable("ROOT_PAGE_ID");
+
+      await fetchPage({
+        notionApiToken: NOTION_API_TOKEN,
+        pageId: ROOT_PAGE_ID,
+      });
+    },
+  )
+  .command(
     "build",
     "take the content in the export directory and build it, placing the result in the dist directory",
     {
@@ -57,7 +80,7 @@ yargs
       // output directory
       // await $`rm -rf static/dist`;
       await $`mkdir -p static/dist`;
-      await $`cp -f static/manual/* static/dist`
+      await $`cp -f static/manual/* static/dist`;
 
       const { pages, assets, sectionPages } = await walkProject();
 

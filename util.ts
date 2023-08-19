@@ -22,6 +22,14 @@ export function relativeToAbsoluteUrl({
   return encodeURI(pageDir.slice("static/export/".length)) + "/" + relativeUrl;
 }
 
+export function ensureEnvironmentVariable(varname: string) {
+  if (process.env[varname] == undefined) {
+    throw new Error(`Must define env variable ${varname}`);
+  }
+
+  return process.env[varname]!
+}
+
 export type Breadcrumb = {
   title: string;
   url: string;
