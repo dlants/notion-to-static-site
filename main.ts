@@ -8,7 +8,7 @@ import express from "express";
 import { insertHeader } from "./transforms/insert-header";
 import _ from "lodash";
 import { transformLinks } from "./transforms/links";
-import { rewriteAbsoluteUrls } from "./transforms/download-images";
+import { preDownloadAssets } from "./transforms/download-images";
 import { youtubeEmbed } from "./transforms/youtube";
 
 yargs
@@ -45,11 +45,16 @@ yargs
   .command(
     "build",
     "take the content in the export directory and build it, placing the result in the dist directory",
-    () => {},
-    async () => {
+    {
+      forceDownload: {
+        describe: "re-download all absolute assets?",
+        type: "boolean",
+      },
+    },
+    async (argv) => {
       // read each file in the export directory, parse it, apply the transforms, then place the results in the
       // output directory
-      await $`rm -rf static/dist`;
+      // await $`rm -rf static/dist`;
       await $`mkdir -p static/dist`;
 
       const { pages, assets, sectionPages } = await walkProject();
@@ -58,9 +63,9 @@ yargs
         console.log(`processing ${page.originalPath}`);
         const $ = cheerio.load(fs.readFileSync(page.originalPath));
 
-        youtubeEmbed({$, page, sectionPages});
+        youtubeEmbed({ $, page, sectionPages });
         transformLinks({ $, urlMap: generateUrlMap({ pages, assets }), page });
-        await rewriteAbsoluteUrls({ $ });
+        await preDownloadAssets({ $, forceDownload: argv.forceDownload });
         insertHeader({ $, page, sectionPages });
 
         const outPath = path.join("static/dist", page.pageUrl);
