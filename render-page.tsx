@@ -9,15 +9,16 @@ import {
 } from "@notionhq/client/build/src/api-endpoints";
 import { renderToString } from "react-dom/server";
 import * as React from "react";
-import { stylesheet, getStyles, classes, cssRule } from "typestyle";
+import { stylesheet, getStyles, classes, cssRule, fontFace } from "typestyle";
 import * as csstips from "csstips";
 import * as csx from "csx";
+import { favicon } from "./favicon";
 
 // see https://typestyle.github.io/#/page
 csstips.normalize();
 csstips.setupPage("#root");
 
-const HEADER_HEIGHT_PX = 30;
+const HEADER_HEIGHT_PX = 60;
 
 const colors = {
   black: csx.hsl(0, 0, 0),
@@ -29,6 +30,7 @@ const colors = {
 const css = stylesheet({
   page: {
     ...csstips.vertical,
+    alignItems: 'center'
   },
 
   navHeader: {
@@ -36,8 +38,10 @@ const css = stylesheet({
     ...csstips.pageTop,
     ...csstips.horizontal,
     ...csstips.horizontallySpaced(10),
-    paddingRight: csx.px(10),
-    alignItems: "center",
+    paddingRight: csx.px(15),
+    paddingLeft: csx.px(15),
+    alignItems: "flex-end",
+    paddingBottom: csx.px(10),
     height: csx.px(HEADER_HEIGHT_PX),
     background: colors.lightgray.toString(),
   },
@@ -65,7 +69,7 @@ const css = stylesheet({
     alignItems: "center",
     $nest: {
       img: {
-        maxHeight: csx.px(HEADER_HEIGHT_PX),
+        maxHeight: csx.px(30),
       },
     },
   },
@@ -76,14 +80,30 @@ const css = stylesheet({
 
   content: {
     ...csstips.flex,
-    ...csstips.horizontallyCenterSelf,
-    width: "80%",
     marginTop: csx.px(HEADER_HEIGHT_PX),
+    marginLeft: csx.px(20),
+    marginRight: csx.px(20),
+    maxWidth: csx.px(720),
   },
 
   subscribe: {},
 
   mention: {
+    $nest: {
+      a: {
+        color: colors.black.toString(),
+        fontWeight: "bold",
+        textDecorationColor: colors.lightgray.toString(),
+        $nest: {
+          "&:hover": {
+            backgroundColor: colors.lightgray.toString(),
+          },
+        },
+      },
+    },
+  },
+
+  childPage: {
     $nest: {
       a: {
         color: colors.black.toString(),
@@ -106,6 +126,14 @@ cssRule("figure img", {
   ...csstips.width("100%"),
 });
 
+cssRule("body", {
+});
+
+cssRule("html", {
+  fontSize: "min(max(12px, 3vw), 18px);",
+  lineHeight: "1.5",
+});
+
 export async function renderPage({
   page,
   pages,
@@ -118,7 +146,9 @@ export async function renderPage({
     async (data, renderer) => {
       const childPage = pages[data.id];
       return renderToString(
-        <div className="child_page">{await pageLink(renderer, childPage)}</div>,
+        <div className={css.childPage}>
+          {await pageLink(renderer, childPage)}
+        </div>,
       );
     },
   );
@@ -157,7 +187,7 @@ export async function renderPage({
     <div className={css.page}>
       <div className={css.navHeader}>
         <a className={css.homeImage} href="index.html">
-          <img src="/favicon.png" />
+          {favicon}
         </a>
         {await Promise.all(
           breadcrumbs.map(async (pageId, idx) => (
@@ -193,8 +223,14 @@ export async function renderPage({
 <html>
 <head>
   <style>${getStyles()}</style>
-  <link rel="icon" type="image/x-icon" href="/favicon.png"></link>
+  <style>
+    html { font-family: 'Roboto', sans-serif; }
+  </style>
+  <link rel="icon" href="./black-rectangle.svg">
   <meta name="viewport" content="width=device-width">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="root">

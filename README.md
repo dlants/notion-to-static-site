@@ -42,7 +42,6 @@ This will automatically re-build your site for every change you make.
 style page, header
 media queries for mobile styling
 favicon
-update pageUrls to use pageIds / hashes, to make links more permanent (so they don't change if the page gets renamed)
 generate rss files for each section
 fixup embeds (collapsible sections, etc...)
 add automatic "next post / previous post" links for multiple pages in the same section
