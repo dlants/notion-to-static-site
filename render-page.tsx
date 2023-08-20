@@ -3,7 +3,10 @@ import { PageWithChildren } from "./fetch-page";
 import { PageId, getBreadcrumbs, getSectionPages } from "./util";
 import fs from "fs";
 import path from "path";
-import { ChildPageBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import {
+  ChildPageBlockObjectResponse,
+  MentionRichTextItemResponse,
+} from "@notionhq/client/build/src/api-endpoints";
 import { renderToString } from "react-dom/server";
 import * as React from "react";
 import { stylesheet, getStyles, classes } from "typestyle";
@@ -44,8 +47,26 @@ export async function renderPage({
     },
   );
 
+  const mentionRenderer = createBlockRenderer<MentionRichTextItemResponse>(
+    "mention",
+    async (data, renderer) => {
+      if (data.mention.type == "page") {
+        const page = pages[data.mention.page.id];
+        if (page) {
+          return renderToString(await pageLink(renderer, page));
+        } else {
+          console.error(`did not find page ${data.mention.page.id}`)
+          // TODO: fix this up
+          return data.plain_text
+        }
+      } else {
+        return data.plain_text
+      }
+    },
+  );
+
   const renderer = new NotionRenderer({
-    renderers: [childPageRenderer],
+    renderers: [childPageRenderer, mentionRenderer],
   });
 
   const breadcrumbs = getBreadcrumbs({ pageId: page.id, pages });
