@@ -98,33 +98,9 @@ export class NotionClientWrapper {
         };
       }
 
-      // TODO: do any other block types contain rich_text?
-      if (block.type == "paragraph") {
-        this.findPageMentions(block.paragraph.rich_text);
-      }
-
-      if (block.type == "heading_1") {
-        this.findPageMentions(block.heading_1.rich_text);
-      }
-
-      if (block.type == "heading_2") {
-        this.findPageMentions(block.heading_2.rich_text);
-      }
-
-      if (block.type == "heading_3") {
-        this.findPageMentions(block.heading_3.rich_text);
-      }
-
-      if (block.type == "bulleted_list_item") {
-        this.findPageMentions(block.bulleted_list_item.rich_text);
-      }
-
-      if (block.type == "numbered_list_item") {
-        this.findPageMentions(block.numbered_list_item.rich_text);
-      }
-
-      if (block.type == "to_do") {
-        this.findPageMentions(block.to_do.rich_text);
+      // TODO: do any block types contain rich_text in other places?
+      if ((block as any)[block.type].rich_text) {
+        this.findPageMentions((block as any)[block.type].rich_text);
       }
 
       if (block.type == "child_page") {

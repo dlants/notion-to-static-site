@@ -111,7 +111,7 @@ export function getSectionPages({ pages }: { pages: PageMap }): PageId[] {
       sections.push(block.id);
     }
   }
-  return sections;
+  return sections.reverse();
 }
 
 // export function generateUrlMap({

@@ -9,8 +9,12 @@ import {
 } from "@notionhq/client/build/src/api-endpoints";
 import { renderToString } from "react-dom/server";
 import * as React from "react";
-import { stylesheet, getStyles, classes } from "typestyle";
+import { stylesheet, getStyles, classes, cssRule } from "typestyle";
 import * as csstips from "csstips";
+
+// see https://typestyle.github.io/#/page
+csstips.normalize();
+csstips.setupPage("#root");
 
 const css = stylesheet({
   page: {},
@@ -23,11 +27,19 @@ const css = stylesheet({
   },
   headerItem: {
     ...csstips.content,
+    $nest: {
+      a: { marginLeft: "10px" },
+    },
   },
   divider: {
     ...csstips.flex,
   },
   subscribe: {},
+});
+
+cssRule("figure img", {
+  ...csstips.horizontallyCenterSelf,
+  ...csstips.width("100%"),
 });
 
 export async function renderPage({
@@ -111,9 +123,12 @@ export async function renderPage({
 <head>
   <style>${getStyles()}</style>
   <link rel="icon" type="image/x-icon" href="/favicon.png"></link>
+  <meta name="viewport" content="width=device-width">
 </head>
 <body>
-${pageContent}
+  <div id="root">
+  ${pageContent}
+  </div>
 </body>
 </html>`;
 
