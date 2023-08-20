@@ -2,6 +2,7 @@ import { Client, isFullBlock, iteratePaginatedAPI } from "@notionhq/client";
 import {
   BlockObjectResponse,
   PageObjectResponse,
+  RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import fs from "fs";
 import path from "path";
@@ -10,6 +11,7 @@ import * as stream from "stream";
 import { promisify } from "util";
 import axios from "axios";
 import url from "url";
+import { PageId } from "./util";
 const finished = promisify(stream.finished);
 
 export type BlockWithChildren = BlockObjectResponse & {
@@ -19,11 +21,12 @@ export type BlockWithChildren = BlockObjectResponse & {
 export type PageWithChildren = PageObjectResponse & {
   children: BlockWithChildren[];
 };
+const ElementsWithRichText = ['paragraph', 'heading_1', 'heading_2', 'heading_3']
 
 export class NotionClientWrapper {
   private notionClient: Client;
-  private pagesToVisit: string[] = [];
-  private visitedPages: Set<string> = new Set();
+  private pagesToVisit: Set<PageId> = new Set();
+  private visitedPages: Set<PageId> = new Set();
 
   constructor(notionApiToken: string) {
     this.notionClient = new Client({
@@ -32,14 +35,16 @@ export class NotionClientWrapper {
   }
 
   async fetchPageAndChildren({ pageId }: { pageId: string }) {
-    this.pagesToVisit = [pageId];
+    this.pagesToVisit = new Set();
+    this.pagesToVisit.add(pageId);
     this.visitedPages = new Set();
 
     while (true) {
-      const nextPageId = this.pagesToVisit.pop();
+      const [nextPageId] = this.pagesToVisit;
       if (!nextPageId) {
         break;
       }
+      this.pagesToVisit.delete(nextPageId)
 
       await this.visitPage(nextPageId);
     }
@@ -64,7 +69,7 @@ export class NotionClientWrapper {
     );
   }
 
-  async getBlockChildren(blockId: string): Promise<BlockWithChildren[]> {
+  private async getBlockChildren(blockId: string): Promise<BlockWithChildren[]> {
     const result: BlockWithChildren[] = [];
     for await (const block of iteratePaginatedAPI(
       this.notionClient.blocks.children.list,
@@ -93,8 +98,37 @@ export class NotionClientWrapper {
         };
       }
 
+      // TODO: do any other block types contain rich_text?
+      if (block.type == "paragraph") {
+        this.findPageMentions(block.paragraph.rich_text);
+      }
+
+      if (block.type == "heading_1") {
+        this.findPageMentions(block.heading_1.rich_text);
+      }
+
+      if (block.type == "heading_2") {
+        this.findPageMentions(block.heading_2.rich_text);
+      }
+
+      if (block.type == "heading_3") {
+        this.findPageMentions(block.heading_3.rich_text);
+      }
+
+      if (block.type == "bulleted_list_item") {
+        this.findPageMentions(block.bulleted_list_item.rich_text);
+      }
+
+      if (block.type == "numbered_list_item") {
+        this.findPageMentions(block.numbered_list_item.rich_text);
+      }
+
+      if (block.type == "to_do") {
+        this.findPageMentions(block.to_do.rich_text);
+      }
+
       if (block.type == "child_page") {
-        this.pagesToVisit.push(block.id);
+        this.pagesToVisit.add(block.id);
         result.push(block);
       } else if (block.has_children) {
         const children = await this.getBlockChildren(block.id);
@@ -109,6 +143,16 @@ export class NotionClientWrapper {
 
     return result;
   }
+
+  private findPageMentions(richText: RichTextItemResponse[]) {
+    for (const element of richText) {
+      if (element.type == 'mention' && element.mention.type == 'page') {
+        this.pagesToVisit.add(element.mention.page.id)
+      }
+    }
+  }
+
+
 }
 
 export async function downloadFile(fileUrl: string): Promise<any> {

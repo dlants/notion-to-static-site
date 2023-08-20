@@ -55,12 +55,13 @@ export async function renderPage({
         if (page) {
           return renderToString(await pageLink(renderer, page));
         } else {
-          console.error(`did not find page ${data.mention.page.id}`)
+          console.error(`did not find page ${data.mention.page.id}`);
           // TODO: fix this up
-          return data.plain_text
+          return data.plain_text;
         }
       } else {
-        return data.plain_text
+        // TODO: maybe use default renderer here
+        return data.plain_text;
       }
     },
   );
