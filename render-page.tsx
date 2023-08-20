@@ -11,30 +11,94 @@ import { renderToString } from "react-dom/server";
 import * as React from "react";
 import { stylesheet, getStyles, classes, cssRule } from "typestyle";
 import * as csstips from "csstips";
+import * as csx from "csx";
 
 // see https://typestyle.github.io/#/page
 csstips.normalize();
 csstips.setupPage("#root");
 
+const HEADER_HEIGHT_PX = 30;
+
+const colors = {
+  black: csx.hsl(0, 0, 0),
+  lightgray: csx.hsl(0, 0, 0.9),
+  darkgray: csx.hsl(0, 0, 0.4),
+  gray: csx.hsl(0, 0, 0.6),
+};
+
 const css = stylesheet({
-  page: {},
-  content: {},
+  page: {
+    ...csstips.vertical,
+  },
 
   navHeader: {
+    ...csstips.content,
     ...csstips.pageTop,
     ...csstips.horizontal,
     ...csstips.horizontallySpaced(10),
+    paddingRight: csx.px(10),
+    alignItems: "center",
+    height: csx.px(HEADER_HEIGHT_PX),
+    background: colors.lightgray.toString(),
   },
+
   headerItem: {
     ...csstips.content,
     $nest: {
-      a: { marginLeft: "10px" },
+      a: {
+        marginLeft: "10px",
+        color: colors.black.toString(),
+        textDecoration: "none",
+        textDecorationColor: colors.lightgray.toString(),
+        $nest: {
+          "&:hover": {
+            backgroundColor: colors.lightgray.toString(),
+          },
+        },
+      },
     },
   },
+
+  homeImage: {
+    ...csstips.content,
+    ...csstips.horizontal,
+    alignItems: "center",
+    $nest: {
+      img: {
+        maxHeight: csx.px(HEADER_HEIGHT_PX),
+      },
+    },
+  },
+
   divider: {
     ...csstips.flex,
   },
+
+  content: {
+    ...csstips.flex,
+    ...csstips.horizontallyCenterSelf,
+    width: "80%",
+    marginTop: csx.px(HEADER_HEIGHT_PX),
+  },
+
   subscribe: {},
+
+  mention: {
+    $nest: {
+      a: {
+        color: colors.black.toString(),
+        fontWeight: "bold",
+        textDecorationColor: colors.lightgray.toString(),
+        $nest: {
+          "&:hover": {
+            backgroundColor: colors.lightgray.toString(),
+          },
+        },
+      },
+    },
+  },
+
+  pageLink: {},
 });
 
 cssRule("figure img", {
@@ -65,7 +129,11 @@ export async function renderPage({
       if (data.mention.type == "page") {
         const page = pages[data.mention.page.id];
         if (page) {
-          return renderToString(await pageLink(renderer, page));
+          return renderToString(
+            <span className={css.mention}>
+              {await pageLink(renderer, page)}
+            </span>,
+          );
         } else {
           console.error(`did not find page ${data.mention.page.id}`);
           // TODO: fix this up
@@ -88,6 +156,9 @@ export async function renderPage({
   const pageContent = renderToString(
     <div className={css.page}>
       <div className={css.navHeader}>
+        <a className={css.homeImage} href="index.html">
+          <img src="/favicon.png" />
+        </a>
         {await Promise.all(
           breadcrumbs.map(async (pageId, idx) => (
             <div className={css.headerItem}>
@@ -127,7 +198,7 @@ export async function renderPage({
 </head>
 <body>
   <div id="root">
-  ${pageContent}
+    ${pageContent}
   </div>
 </body>
 </html>`;
@@ -139,6 +210,7 @@ async function pageLink(renderer: NotionRenderer, page: PageWithChildren) {
   const title = await renderPageTitle(renderer, page);
   return (
     <a
+      className={css.pageLink}
       href={page.id + ".html"}
       dangerouslySetInnerHTML={{
         __html: title,
