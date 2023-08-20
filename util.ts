@@ -1,11 +1,30 @@
-import * as fs from "fs";
-import * as path from "path";
+import { BlockWithChildren, PageWithChildren } from "./fetch-page";
 
-export async function* walk(dir: string): AsyncGenerator<string> {
-  for await (const ent of await fs.promises.opendir(dir)) {
-    const entry = path.join(dir, ent.name);
-    if (ent.isDirectory()) yield* walk(entry);
-    else if (ent.isFile()) yield entry;
+export type BlockId = string;
+export type PageId = string;
+
+/** BFS traversal of all the blocks in the page, without re-visiting the same block **/
+export function* walkChildrenBFS(page: PageWithChildren) {
+  const visitedBlocks: Set<BlockId> = new Set();
+  visitedBlocks.add(page.id);
+
+  const blocksToVisit: BlockWithChildren[] = page.children.slice() || [];
+
+  while (true) {
+    const block = blocksToVisit.pop();
+    if (!block) {
+      return;
+    }
+    if (visitedBlocks.has(block.id)) {
+      continue;
+    }
+    visitedBlocks.add(block.id);
+
+    if (block.children) {
+      blocksToVisit.push(...block.children);
+    }
+
+    yield block;
   }
 }
 
@@ -27,7 +46,7 @@ export function ensureEnvironmentVariable(varname: string) {
     throw new Error(`Must define env variable ${varname}`);
   }
 
-  return process.env[varname]!
+  return process.env[varname]!;
 }
 
 export type Breadcrumb = {
@@ -35,44 +54,57 @@ export type Breadcrumb = {
   url: string;
 };
 
-export type PageInfo = {
-  id: string;
-  breadcrumbs: Breadcrumb[];
-  title: string;
-  originalPath: string;
-  pageUrl: string;
-  dir: string;
-  assetDir: string;
+export type PageMap = {
+  [pageId: PageId]: PageWithChildren;
 };
 
 export type AssetInfo = {
-  originalPath: string;
-  newPath: string;
+  originalUrl: string;
+  url: string;
   basename: string;
-  dir: string;
 };
 
 export type UrlMap = {
   [originalUrl: string]: string;
 };
 
-export function generateUrlMap({
-  pages,
-  assets,
-}: {
-  pages: PageInfo[];
-  assets: AssetInfo[];
-}) {
-  const urlMap: UrlMap = {};
-  for (const page of pages) {
-    urlMap[encodeURI(page.originalPath.replace(/^static\/export\//, ""))] =
-      encodeURIComponent(page.pageUrl);
+// remap page Id from xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx to
+// xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+export function normalizePageId(pageId: string) {
+  if (pageId.length == 32) {
+    return (
+      pageId.slice(0, 8) +
+      "-" +
+      pageId.slice(8, 12) +
+      "-" +
+      pageId.slice(12, 16) +
+      "-" +
+      pageId.slice(16, 20) +
+      "-" +
+      pageId.slice(20)
+    );
+  } else {
+    return pageId;
   }
-
-  for (const asset of assets) {
-    urlMap[encodeURI(asset.originalPath.replace(/^static\/export\//, ""))] =
-      encodeURIComponent(asset.newPath);
-  }
-
-  return urlMap;
 }
+
+// export function generateUrlMap({
+//   pages,
+//   assets,
+// }: {
+//   pages: PageInfo[];
+//   assets: AssetInfo[];
+// }) {
+//   const urlMap: UrlMap = {};
+//   for (const page of pages) {
+//     urlMap[encodeURI(page.originalPath.replace(/^static\/export\//, ""))] =
+//       encodeURIComponent(page.pageUrl);
+//   }
+//
+//   for (const asset of assets) {
+//     urlMap[encodeURI(asset.originalUrl.replace(/^static\/export\//, ""))] =
+//       encodeURIComponent(asset.url);
+//   }
+//
+//   return urlMap;
+// }

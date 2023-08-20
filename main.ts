@@ -1,24 +1,12 @@
 import * as yargs from "yargs";
 import { $ } from "zx";
-import {
-  AssetInfo,
-  Breadcrumb,
-  PageInfo,
-  ensureEnvironmentVariable,
-  generateUrlMap,
-} from "./util";
-import * as cheerio from "cheerio";
-import * as fs from "fs";
-import * as path from "path";
+import { ensureEnvironmentVariable, normalizePageId } from "./util";
 import express from "express";
-import { insertHeader } from "./transforms/insert-header";
 import _ from "lodash";
-import { transformLinks } from "./transforms/links";
-import { preDownloadAssets } from "./transforms/download-images";
-import { youtubeEmbed } from "./transforms/youtube";
-import { insertFavicon } from "./transforms/insert-favicon";
 import dotenv from "dotenv";
 import { NotionClientWrapper } from "./fetch-page";
+import { loadPages } from "./load-page";
+import { renderPage } from "./render-page";
 dotenv.config();
 
 yargs
@@ -35,15 +23,8 @@ yargs
       const app = express();
 
       app.use(
-        "/export",
-        express.static("static/export", {
-          extensions: ["html"],
-        }),
-      );
-
-      app.use(
         "/",
-        express.static("static/dist", {
+        express.static("dist", {
           extensions: ["html"],
         }),
       );
@@ -61,6 +42,8 @@ yargs
       const ROOT_PAGE_ID = ensureEnvironmentVariable("ROOT_PAGE_ID");
       const client = new NotionClientWrapper(NOTION_API_TOKEN);
 
+      await $`rm -rf cache`;
+      await $`mkdir -p cache/images`;
       await client.fetchPageAndChildren({
         pageId: ROOT_PAGE_ID,
       });
@@ -75,128 +58,23 @@ yargs
         type: "boolean",
       },
     },
-    async (argv) => {
-      // read each file in the export directory, parse it, apply the transforms, then place the results in the
-      // output directory
-      // await $`rm -rf static/dist`;
-      await $`mkdir -p static/dist`;
-      await $`cp -f static/manual/* static/dist`;
+    async (_argv) => {
+      await $`rm -rf dist`;
+      await $`mkdir -p dist/images`;
+      await $`cp -f -r static/* dist`;
+      await $`cp -f -r cache/images/* dist/images/`;
 
-      const { pages, assets, sectionPages } = await walkProject();
+      const ROOT_PAGE_ID = normalizePageId(
+        ensureEnvironmentVariable("ROOT_PAGE_ID"),
+      );
+      const { pages } = await loadPages(ROOT_PAGE_ID);
 
-      for (const page of pages) {
-        console.log(`processing ${page.originalPath}`);
-        const $ = cheerio.load(fs.readFileSync(page.originalPath));
-
-        youtubeEmbed({ $, page, sectionPages });
-        transformLinks({ $, urlMap: generateUrlMap({ pages, assets }), page });
-        await preDownloadAssets({ $, forceDownload: argv.forceDownload });
-        insertHeader({ $, page, sectionPages });
-        insertFavicon({ $, page, sectionPages });
-
-        const outPath = path.join("static/dist", page.pageUrl);
-        fs.writeFileSync(outPath, $.html());
-        console.log(`wrote ${outPath}`);
-      }
-
-      for (const asset of assets) {
-        const outPath = path.join("static/dist", asset.newPath);
-        fs.copyFileSync(asset.originalPath, outPath);
-        console.log(`wrote ${outPath}`);
+      for (const pageId in pages) {
+        const page = pages[pageId];
+        console.log(`processing ${page.id}`);
+        console.log(JSON.stringify(page, null, 2))
+        await renderPage({ page, pages });
       }
     },
   )
   .help().argv;
-
-async function walkProject() {
-  const pages: PageInfo[] = [];
-  const assets: AssetInfo[] = [];
-  const sectionpages: PageInfo[] = [];
-
-  const dirsToRead: {
-    dirPath: string;
-    breadcrumbs: Breadcrumb[];
-  }[] = [{ dirPath: "static/export", breadcrumbs: [] }];
-  const existingPaths = new Set<string>();
-
-  while (dirsToRead.length) {
-    const dirToRead = dirsToRead.pop();
-    if (!dirToRead) {
-      break;
-    }
-
-    const { dirPath, breadcrumbs } = dirToRead;
-
-    for await (const ent of await fs.promises.opendir(dirPath)) {
-      const entPath = path.join(dirPath, ent.name);
-      if (ent.isFile()) {
-        if (/\.html$/.test(entPath)) {
-          const $ = cheerio.load(fs.readFileSync(entPath));
-          const pageId = $("article").attr("id");
-          if (!pageId) {
-            throw new Error(`Could not identify pageId for ppath ${entPath}`);
-          }
-          const title = $(".page-title").text();
-          const page: PageInfo = {
-            id: pageId,
-            originalPath: entPath,
-            pageUrl: pageId.replace(/-/g, "") + ".html",
-            title,
-            dir: dirPath,
-            breadcrumbs,
-            assetDir: entPath.replace(/\.html$/, ""),
-          };
-          // we list the export directory first. It should only have a single page inside of it, which will be inserted
-          // into the pages array first. This is our index page.
-          if (pages.length == 0) {
-            page.pageUrl = "index.html";
-          }
-
-          pages.push(page);
-
-          if (breadcrumbs.length == 1) {
-            sectionpages.push(page);
-          }
-
-          const pageDir = entPath.slice(0, entPath.lastIndexOf(".html"));
-
-          // there should be a corresponding directory for the page
-          if (fs.existsSync(pageDir)) {
-            dirsToRead.push({
-              dirPath: pageDir,
-              breadcrumbs: [
-                ...breadcrumbs,
-                {
-                  title,
-                  url: page.pageUrl,
-                },
-              ],
-            });
-          }
-        } else {
-          // assume ent is an asset
-          const ext = path.extname(entPath);
-          const name = path.basename(entPath, ext);
-          let newPath;
-          let index = 0;
-          while (true) {
-            newPath = name + (index == 0 ? "" : `(${index})`) + ext;
-            if (!existingPaths.has(newPath)) {
-              existingPaths.add(newPath);
-              break;
-            }
-          }
-
-          assets.push({
-            originalPath: entPath,
-            dir: dirPath,
-            basename: path.basename(entPath),
-            newPath,
-          });
-        }
-      }
-    }
-  }
-
-  return { pages, assets, sectionPages: sectionpages };
-}
