@@ -82,12 +82,12 @@ export class NotionClientWrapper {
             ? block.image.external.url
             : block.image.file.url;
 
-        const fileName = await downloadFile(imgUrl);
+        const imageUrl = await downloadFile(imgUrl);
 
         block.image = {
           type: "external",
           external: {
-            url: path.basename(fileName),
+            url: encodeURIComponent(imageUrl),
           },
           caption: block.image.caption,
         };
@@ -113,9 +113,9 @@ export class NotionClientWrapper {
 
 export async function downloadFile(fileUrl: string): Promise<any> {
   const parsed = new url.URL(fileUrl, "https://www.bogus.com");
-  const fileName = path.join("cache", "images", path.basename(parsed.pathname!));
+  const imageUrl = path.join("images", path.basename(parsed.pathname!));
 
-  const writer = fs.createWriteStream(fileName);
+  const writer = fs.createWriteStream(path.join("cache", imageUrl));
   return axios({
     method: "get",
     url: fileUrl,
@@ -123,6 +123,6 @@ export async function downloadFile(fileUrl: string): Promise<any> {
   }).then(async (response) => {
     response.data.pipe(writer);
     await finished(writer);
-    return fileName;
+    return imageUrl;
   });
 }

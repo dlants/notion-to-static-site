@@ -49,11 +49,6 @@ export function ensureEnvironmentVariable(varname: string) {
   return process.env[varname]!;
 }
 
-export type Breadcrumb = {
-  title: string;
-  url: string;
-};
-
 export type PageMap = {
   [pageId: PageId]: PageWithChildren;
 };
@@ -86,6 +81,37 @@ export function normalizePageId(pageId: string) {
   } else {
     return pageId;
   }
+}
+
+export function getBreadcrumbs({
+  pageId,
+  pages,
+}: {
+  pageId: PageId;
+  pages: PageMap;
+}) {
+  const breadcrumbs: PageId[] = [];
+  let currentPageId = pageId;
+  while (true) {
+    const page = pages[currentPageId];
+    breadcrumbs.push(page.id);
+    if (page.parent.type == "page_id") {
+      currentPageId = page.parent.page_id;
+    } else {
+      return breadcrumbs.reverse();
+    }
+  }
+}
+
+export function getSectionPages({ pages }: { pages: PageMap }): PageId[] {
+  const sections = [];
+  const indexPage = pages["index"];
+  for (const block of walkChildrenBFS(indexPage)) {
+    if (block.type == "child_page") {
+      sections.push(block.id);
+    }
+  }
+  return sections;
 }
 
 // export function generateUrlMap({

@@ -72,7 +72,6 @@ yargs
       for (const pageId in pages) {
         const page = pages[pageId];
         console.log(`processing ${page.id}`);
-        console.log(JSON.stringify(page, null, 2))
         await renderPage({ page, pages });
       }
     },
