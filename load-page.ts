@@ -1,4 +1,4 @@
-import { PageId, PageMap, walkChildrenBFS } from "./util";
+import { PageId, PageMap, generateBlockMap, walkChildrenBFS } from "./util";
 import * as fs from "fs";
 import * as path from "path";
 import { PageWithChildren } from "./fetch-page";
@@ -24,7 +24,8 @@ export async function loadPages(rootPageId: string) {
 
   remapId({ oldPageId: rootPageId, newPageId: "index", pages });
 
-  return { pages };
+  const blocks = generateBlockMap({pages});
+  return { pages, blocks };
 }
 
 function remapId({

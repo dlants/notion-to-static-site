@@ -1,6 +1,12 @@
 import { NotionRenderer, createBlockRenderer } from "@notion-render/client";
 import { PageWithChildren } from "./fetch-page";
-import { PageId, getBreadcrumbs, getSectionPages } from "./util";
+import {
+  BlockMap,
+  PageId,
+  PageMap,
+  getBreadcrumbs,
+  getSectionPages,
+} from "./util";
 import fs from "fs";
 import path from "path";
 import {
@@ -140,9 +146,11 @@ cssRule("html", {
 export async function renderPage({
   page,
   pages,
+  blocks,
 }: {
   page: PageWithChildren;
-  pages: { [pageId: PageId]: PageWithChildren };
+  pages: PageMap;
+  blocks: BlockMap;
 }) {
   const childPageRenderer = createBlockRenderer<ChildPageBlockObjectResponse>(
     "child_page",
@@ -183,7 +191,7 @@ export async function renderPage({
     renderers: [childPageRenderer, mentionRenderer],
   });
 
-  const breadcrumbs = getBreadcrumbs({ pageId: page.id, pages });
+  const breadcrumbs = getBreadcrumbs({ pageId: page.id, pages, blocks });
   const sectionPages = getSectionPages({ pages });
 
   const pageContent = renderToString(

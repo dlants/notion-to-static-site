@@ -53,6 +53,10 @@ export type PageMap = {
   [pageId: PageId]: PageWithChildren;
 };
 
+export type BlockMap = {
+  [blockId: BlockId]: BlockWithChildren;
+};
+
 export type AssetInfo = {
   originalUrl: string;
   url: string;
@@ -83,23 +87,61 @@ export function normalizePageId(pageId: string) {
   }
 }
 
+export function generateBlockMap({ pages }: { pages: PageMap }): BlockMap {
+  const blockMap: BlockMap = {};
+  for (const pageId in pages) {
+    for (const block of walkChildrenBFS(pages[pageId])) {
+      blockMap[block.id] = block;
+    }
+  }
+
+  return blockMap;
+}
+
 export function getBreadcrumbs({
   pageId,
   pages,
+  blocks,
 }: {
   pageId: PageId;
   pages: PageMap;
+  blocks: BlockMap;
 }) {
   const breadcrumbs: PageId[] = [];
-  let currentPageId = pageId;
-  while (true) {
-    const page = pages[currentPageId];
-    breadcrumbs.push(page.id);
-    if (page.parent.type == "page_id") {
-      currentPageId = page.parent.page_id;
-    } else {
-      return breadcrumbs.reverse();
+
+  let currentLoc: Loc | undefined = { type: "pageId", pageId };
+
+  while (currentLoc) {
+    switch (currentLoc.type) {
+      case "pageId":
+        const page = pages[currentLoc.pageId];
+        breadcrumbs.push(page.id);
+        currentLoc = getParentLoc(page.parent);
+        break;
+
+      case "blockId":
+        const block = blocks[currentLoc.blockId];
+        currentLoc = getParentLoc(block.parent);
+        break;
     }
+  }
+
+  return breadcrumbs.reverse();
+}
+
+type Loc =
+  | { type: "pageId"; pageId: PageId }
+  | { type: "blockId"; blockId: BlockId };
+
+function getParentLoc(
+  parent: PageWithChildren["parent"] | BlockWithChildren["parent"],
+): Loc | undefined {
+  if (parent.type == "page_id") {
+    return { type: "pageId", pageId: parent.page_id };
+  } else if (parent.type == "block_id") {
+    return { type: "blockId", blockId: parent.block_id };
+  } else {
+    return undefined;
   }
 }
 

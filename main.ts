@@ -67,12 +67,12 @@ yargs
       const ROOT_PAGE_ID = normalizePageId(
         ensureEnvironmentVariable("ROOT_PAGE_ID"),
       );
-      const { pages } = await loadPages(ROOT_PAGE_ID);
+      const { pages, blocks } = await loadPages(ROOT_PAGE_ID);
 
       for (const pageId in pages) {
         const page = pages[pageId];
         console.log(`processing ${page.id}`);
-        await renderPage({ page, pages });
+        await renderPage({ page, pages, blocks });
       }
     },
   )
