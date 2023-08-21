@@ -39,8 +39,8 @@ npx tsx main.ts serve
 This will automatically re-build your site for every change you make to the code.
 
 # TODO
-fixup block parent traversing / breadcrumbs
 stop using notion-render and write custom rendering code
+- occasionally drops blocks?!
 - respect image sizes
 - render titles when rendering page
 - fixup quote blocks

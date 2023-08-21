@@ -25,6 +25,7 @@ csstips.normalize();
 csstips.setupPage("#root");
 
 const HEADER_HEIGHT_PX = 60;
+const MAX_WIDTH_PX = 720
 
 const colors = {
   black: csx.hsl(0, 0, 0),
@@ -89,7 +90,7 @@ const css = stylesheet({
     marginTop: csx.px(HEADER_HEIGHT_PX),
     marginLeft: csx.px(20),
     marginRight: csx.px(20),
-    maxWidth: csx.px(720),
+    maxWidth: csx.px(MAX_WIDTH_PX),
   },
 
   subscribe: {},
@@ -142,6 +143,23 @@ cssRule("html", {
     },
   },
 });
+
+cssRule(".notion-code", {
+  background: colors.lightgray.toString(),
+  paddingLeft: csx.px(15),
+  overflow: 'scroll'
+});
+
+cssRule("blockquote", {
+  borderLeft: csx.border({
+    color: colors.darkgray.toString(),
+    style: "solid",
+    width: csx.px(2),
+  }),
+  paddingLeft: csx.px(20)
+});
+
+
 
 export async function renderPage({
   page,
