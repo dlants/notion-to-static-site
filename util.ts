@@ -155,24 +155,3 @@ export function getSectionPages({ pages }: { pages: PageMap }): PageId[] {
   }
   return sections.reverse();
 }
-
-// export function generateUrlMap({
-//   pages,
-//   assets,
-// }: {
-//   pages: PageInfo[];
-//   assets: AssetInfo[];
-// }) {
-//   const urlMap: UrlMap = {};
-//   for (const page of pages) {
-//     urlMap[encodeURI(page.originalPath.replace(/^static\/export\//, ""))] =
-//       encodeURIComponent(page.pageUrl);
-//   }
-//
-//   for (const asset of assets) {
-//     urlMap[encodeURI(asset.originalUrl.replace(/^static\/export\//, ""))] =
-//       encodeURIComponent(asset.url);
-//   }
-//
-//   return urlMap;
-// }
