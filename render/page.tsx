@@ -1,38 +1,20 @@
-import { NotionRenderer, createBlockRenderer } from "@notion-render/client";
-import { PageWithChildren } from "./fetch-page";
-import {
-  BlockMap,
-  PageId,
-  PageMap,
-  getBreadcrumbs,
-  getSectionPages,
-} from "./util";
+import { PageWithChildren } from "../fetch-page";
+import { RenderContext, getBreadcrumbs, getSectionPages } from "../util";
 import fs from "fs";
 import path from "path";
-import {
-  ChildPageBlockObjectResponse,
-  MentionRichTextItemResponse,
-} from "@notionhq/client/build/src/api-endpoints";
 import { renderToString } from "react-dom/server";
 import * as React from "react";
 import { stylesheet, getStyles, classes, cssRule } from "typestyle";
 import * as csstips from "csstips";
 import * as csx from "csx";
 import { favicon } from "./favicon";
+import { HEADER_HEIGHT_PX, MAX_WIDTH_PX, colors } from "./constants";
+import { pageLink } from "./common";
+import { renderBlock } from "./block";
 
 // see https://typestyle.github.io/#/page
 csstips.normalize();
 csstips.setupPage("#root");
-
-const HEADER_HEIGHT_PX = 60;
-const MAX_WIDTH_PX = 720
-
-const colors = {
-  black: csx.hsl(0, 0, 0),
-  lightgray: csx.hsl(0, 0, 0.9),
-  darkgray: csx.hsl(0, 0, 0.4),
-  gray: csx.hsl(0, 0, 0.6),
-};
 
 const css = stylesheet({
   page: {
@@ -94,38 +76,6 @@ const css = stylesheet({
   },
 
   subscribe: {},
-
-  mention: {
-    $nest: {
-      a: {
-        color: colors.black.toString(),
-        fontWeight: "bold",
-        textDecorationColor: colors.lightgray.toString(),
-        $nest: {
-          "&:hover": {
-            backgroundColor: colors.lightgray.toString(),
-          },
-        },
-      },
-    },
-  },
-
-  childPage: {
-    $nest: {
-      a: {
-        color: colors.black.toString(),
-        fontWeight: "bold",
-        textDecorationColor: colors.lightgray.toString(),
-        $nest: {
-          "&:hover": {
-            backgroundColor: colors.lightgray.toString(),
-          },
-        },
-      },
-    },
-  },
-
-  pageLink: {},
 });
 
 cssRule("figure img", {
@@ -147,7 +97,7 @@ cssRule("html", {
 cssRule(".notion-code", {
   background: colors.lightgray.toString(),
   paddingLeft: csx.px(15),
-  overflow: 'scroll'
+  overflow: "scroll",
 });
 
 cssRule("blockquote", {
@@ -156,61 +106,19 @@ cssRule("blockquote", {
     style: "solid",
     width: csx.px(2),
   }),
-  paddingLeft: csx.px(20)
+  paddingLeft: csx.px(20),
 });
 
-
-
-export async function renderPage({
-  page,
-  pages,
-  blocks,
-}: {
-  page: PageWithChildren;
-  pages: PageMap;
-  blocks: BlockMap;
-}) {
-  const childPageRenderer = createBlockRenderer<ChildPageBlockObjectResponse>(
-    "child_page",
-    async (data, renderer) => {
-      const childPage = pages[data.id];
-      return renderToString(
-        <div className={css.childPage}>
-          {await pageLink(renderer, childPage)}
-        </div>,
-      );
-    },
-  );
-
-  const mentionRenderer = createBlockRenderer<MentionRichTextItemResponse>(
-    "mention",
-    async (data, renderer) => {
-      if (data.mention.type == "page") {
-        const page = pages[data.mention.page.id];
-        if (page) {
-          return renderToString(
-            <span className={css.mention}>
-              {await pageLink(renderer, page)}
-            </span>,
-          );
-        } else {
-          console.error(`did not find page ${data.mention.page.id}`);
-          // TODO: fix this up
-          return data.plain_text;
-        }
-      } else {
-        // TODO: maybe use default renderer here
-        return data.plain_text;
-      }
-    },
-  );
-
-  const renderer = new NotionRenderer({
-    renderers: [childPageRenderer, mentionRenderer],
+export async function renderPage(
+  page: PageWithChildren,
+  context: RenderContext,
+) {
+  const breadcrumbs = getBreadcrumbs({
+    pageId: page.id,
+    pages: context.pages,
+    blocks: context.blocks,
   });
-
-  const breadcrumbs = getBreadcrumbs({ pageId: page.id, pages, blocks });
-  const sectionPages = getSectionPages({ pages });
+  const sectionPages = getSectionPages({ pages: context.pages });
 
   const pageContent = renderToString(
     <div className={css.page}>
@@ -222,7 +130,7 @@ export async function renderPage({
           breadcrumbs.map(async (pageId, idx) => (
             <div className={css.headerItem}>
               {idx == 0 ? "" : ">"}
-              {await pageLink(renderer, pages[pageId])}
+              {pageLink(context.pages[pageId], context)}
             </div>
           )),
         )}
@@ -230,7 +138,7 @@ export async function renderPage({
         {await Promise.all(
           sectionPages.map(async (pageId) => (
             <div className={css.headerItem}>
-              {await pageLink(renderer, pages[pageId])}
+              {pageLink(context.pages[pageId], context)}
             </div>
           )),
         )}
@@ -238,12 +146,9 @@ export async function renderPage({
           <a href="https://buttondown.email/dlants">get emails</a>
         </div>
       </div>
-      <div
-        className={css.content}
-        dangerouslySetInnerHTML={{
-          __html: await renderer.render(...page.children),
-        }}
-      />
+      <div className={css.content}>
+        {page.children.map((block) => renderBlock(block, context))}
+      </div>
     </div>,
   );
 
@@ -269,21 +174,4 @@ export async function renderPage({
 </html>`;
 
   fs.writeFileSync(path.join("dist", page.id + ".html"), html);
-}
-
-async function pageLink(renderer: NotionRenderer, page: PageWithChildren) {
-  const title = await renderPageTitle(renderer, page);
-  return (
-    <a
-      className={css.pageLink}
-      href={page.id + ".html"}
-      dangerouslySetInnerHTML={{
-        __html: title,
-      }}
-    />
-  );
-}
-
-function renderPageTitle(renderer: NotionRenderer, page: PageWithChildren) {
-  return renderer.render(...(page.properties["title"] as any).title);
 }

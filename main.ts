@@ -6,7 +6,7 @@ import _ from "lodash";
 import dotenv from "dotenv";
 import { NotionClientWrapper } from "./fetch-page";
 import { loadPages } from "./load-page";
-import { renderPage } from "./render-page";
+import { renderPage } from "./render/page";
 dotenv.config();
 
 yargs
@@ -72,7 +72,7 @@ yargs
       for (const pageId in pages) {
         const page = pages[pageId];
         console.log(`processing ${page.id}`);
-        await renderPage({ page, pages, blocks });
+        await renderPage(page, { pages, blocks });
       }
     },
   )

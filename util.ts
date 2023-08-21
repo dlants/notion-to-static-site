@@ -57,6 +57,11 @@ export type BlockMap = {
   [blockId: BlockId]: BlockWithChildren;
 };
 
+export type RenderContext = {
+  pages: PageMap,
+  blocks: BlockMap
+}
+
 export type AssetInfo = {
   originalUrl: string;
   url: string;
@@ -154,4 +159,8 @@ export function getSectionPages({ pages }: { pages: PageMap }): PageId[] {
     }
   }
   return sections.reverse();
+}
+
+export function assertUnreachable(val: never) {
+  throw new Error(`Unexpected value: ${val}`)
 }

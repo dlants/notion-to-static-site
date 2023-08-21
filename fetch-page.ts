@@ -6,7 +6,6 @@ import {
 } from "@notionhq/client/build/src/api-endpoints";
 import fs from "fs";
 import path from "path";
-import { $ } from "zx";
 import * as stream from "stream";
 import { promisify } from "util";
 import axios from "axios";
@@ -21,7 +20,6 @@ export type BlockWithChildren = BlockObjectResponse & {
 export type PageWithChildren = PageObjectResponse & {
   children: BlockWithChildren[];
 };
-const ElementsWithRichText = ['paragraph', 'heading_1', 'heading_2', 'heading_3']
 
 export class NotionClientWrapper {
   private notionClient: Client;
