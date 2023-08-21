@@ -9,7 +9,7 @@ import {
 } from "@notionhq/client/build/src/api-endpoints";
 import { renderToString } from "react-dom/server";
 import * as React from "react";
-import { stylesheet, getStyles, classes, cssRule, fontFace } from "typestyle";
+import { stylesheet, getStyles, classes, cssRule } from "typestyle";
 import * as csstips from "csstips";
 import * as csx from "csx";
 import { favicon } from "./favicon";
@@ -30,7 +30,7 @@ const colors = {
 const css = stylesheet({
   page: {
     ...csstips.vertical,
-    alignItems: 'center'
+    alignItems: "center",
   },
 
   navHeader: {
@@ -126,12 +126,15 @@ cssRule("figure img", {
   ...csstips.width("100%"),
 });
 
-cssRule("body", {
-});
-
 cssRule("html", {
   fontSize: "min(max(12px, 3vw), 18px);",
   lineHeight: "1.5",
+  $nest: {
+    a: {
+      color: colors.darkgray.toString(),
+      textDecorationColor: colors.darkgray.toString(),
+    },
+  },
 });
 
 export async function renderPage({

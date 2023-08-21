@@ -36,16 +36,24 @@ npx tsx watch ./main.ts build
 npx tsx main.ts serve
 ```
 
-This will automatically re-build your site for every change you make.
+This will automatically re-build your site for every change you make to the code.
 
 # TODO
-style page, header
-media queries for mobile styling
-favicon
-generate rss files for each section
+fixup block parent traversing / breadcrumbs
+stop using notion-render and write custom rendering code
+- respect image sizes
+- render titles when rendering page
+- fixup quote blocks
+- setup something w/ highlighting for code blocks
+setup inline buttondown subscribe
+backlinks
+next/previous links for posts within page
+make inline links less ugly
+generate rss/atom feeds of sub-pages & mentions for each page
+media queries for mobile styling of header
 fixup embeds (collapsible sections, etc...)
 add automatic "next post / previous post" links for multiple pages in the same section
-add #naviation links to each title / subtitle
+add #navigation links to each title / subtitle
 check the build results into the repo, set up render to mirror repo to website
 
 # MAYBE
