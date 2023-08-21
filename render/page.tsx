@@ -164,7 +164,8 @@ export async function renderPage(
   <meta name="viewport" content="width=device-width">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono" rel="stylesheet">
 </head>
 <body>
   <div id="root">

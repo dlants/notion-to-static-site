@@ -41,6 +41,7 @@ export function renderBlock(block: BlockWithChildren, context: RenderContext) {
     case "toggle":
     case "template":
     case "synced_block":
+      return <div>Not implemented</div>;
     case "child_page":
       const childPage = context.pages[block.id];
       if (!childPage) {
