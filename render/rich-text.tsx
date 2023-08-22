@@ -3,8 +3,8 @@ import * as React from "react";
 import { RenderContext, assertUnreachable } from "../util";
 import { stylesheet } from "typestyle";
 import { colors } from "./constants";
-import { pageLink } from "./common";
 import _ from "lodash";
+import { PageWithChildren } from "../fetch-page";
 
 const css = stylesheet({
   mention: {
@@ -21,49 +21,67 @@ const css = stylesheet({
       },
     },
   },
+
+  pageLink: {},
 });
 
 export function renderRichText(
   richText: RichTextItemResponse[],
   context: RenderContext,
 ) {
-  return richText.map((item) => {
-    let content;
-    switch (item.type) {
-      case "text":
-        content = item.plain_text;
-        break;
-      case "mention":
-        if (item.mention.type == "page") {
-          const page = context.pages[item.mention.page.id];
-          if (page) {
-            content = (
-              <span className={css.mention}>{pageLink(page, context)}</span>
-            );
-          } else {
-            console.error(`did not find page ${item.mention.page.id}`);
-            // TODO: fix this up
-            content = item.plain_text;
-          }
+  return (
+    <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+      {renderRichTextContents(richText, context)}
+    </div>
+  );
+}
+
+function renderRichTextContents(
+  richText: RichTextItemResponse[],
+  context: RenderContext,
+) {
+  return richText.map((item) => renderRichTextElement(item, context));
+}
+
+function renderRichTextElement(
+  item: RichTextItemResponse,
+  context: RenderContext,
+) {
+  let content;
+  switch (item.type) {
+    case "text":
+      content = item.plain_text;
+      break;
+    case "mention":
+      if (item.mention.type == "page") {
+        const page = context.pages[item.mention.page.id];
+        if (page) {
+          content = (
+            <span className={css.mention}>{pageLink(page, context)}</span>
+          );
         } else {
-          // TODO: maybe use default renderer here
+          console.error(`did not find page ${item.mention.page.id}`);
+          // TODO: fix this up
           content = item.plain_text;
         }
-        break;
-
-      case "equation":
+      } else {
+        // TODO: maybe use default renderer here
         content = item.plain_text;
-        break;
-      default:
-        assertUnreachable(item);
-    }
+      }
+      break;
 
-    if (!_.isEmpty(item.annotations)) {
-      content = <span style={getStyle(item.annotations)}>{content}</span>;
-    }
+    case "equation":
+      content = item.plain_text;
+      break;
+    default:
+      assertUnreachable(item);
+  }
 
-    return content
-  });
+  if (!_.isEmpty(item.annotations)) {
+    content = <span style={getStyle(item.annotations)}>{content}</span>;
+  }
+
+  return content;
 }
 
 function getStyle(
@@ -88,13 +106,26 @@ function getStyle(
   }
 
   if (annotations.code) {
-    properties.fontFamily = "'Roboto Mono', monospace;"
+    properties.fontFamily = "'Roboto Mono', monospace;";
   }
 
   if (annotations.color) {
     // TODO: not implemented
-    console.warn('annotations.color not implemented')
+    console.warn("annotations.color not implemented");
   }
 
   return properties;
+}
+
+export function pageLink(page: PageWithChildren, context: RenderContext) {
+  return (
+    <a className={css.pageLink} href={page.id + ".html"}>
+      {page.properties["title"]
+        ? renderRichTextContents(
+            (page.properties["title"] as any).title,
+            context,
+          )
+        : ""}
+    </a>
+  );
 }

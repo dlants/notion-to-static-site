@@ -9,7 +9,7 @@ import * as csstips from "csstips";
 import * as csx from "csx";
 import { favicon } from "./favicon";
 import { HEADER_HEIGHT_PX, MAX_WIDTH_PX, colors } from "./constants";
-import { pageLink } from "./common";
+import { pageLink, renderRichText } from "./rich-text";
 import { renderBlock } from "./block";
 
 // see https://typestyle.github.io/#/page
@@ -100,15 +100,6 @@ cssRule(".notion-code", {
   overflow: "scroll",
 });
 
-cssRule("blockquote", {
-  borderLeft: csx.border({
-    color: colors.darkgray.toString(),
-    style: "solid",
-    width: csx.px(2),
-  }),
-  paddingLeft: csx.px(20),
-});
-
 export async function renderPage(
   page: PageWithChildren,
   context: RenderContext,
@@ -147,6 +138,12 @@ export async function renderPage(
         </div>
       </div>
       <div className={css.content}>
+        <h1>{page.properties["title"]
+        ? renderRichText(
+            (page.properties["title"] as any).title,
+            context,
+          )
+        : ""}</h1>
         {page.children.map((block) => renderBlock(block, context))}
       </div>
     </div>,
