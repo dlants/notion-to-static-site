@@ -8,8 +8,20 @@ import * as csx from "csx";
 import * as csstips from "csstips";
 
 const css = stylesheet({
-  video: {},
-  paragraph: {},
+  video: {
+    ...csstips.vertical,
+    alignItems: "center",
+    ...csstips.width("100%"),
+    $nest: {
+      iframe: {
+        ...csstips.content,
+      },
+    },
+  },
+  paragraph: {
+    marginTop: csx.px(1),
+    marginBottom: csx.px(1),
+  },
   childPage: {
     $nest: {
       a: {
@@ -33,12 +45,23 @@ const css = stylesheet({
     paddingLeft: csx.px(20),
   },
   image: {
+    ...csstips.vertical,
+    alignItems: "center",
+    ...csstips.width("100%"),
     $nest: {
       img: {
-        ...csstips.horizontallyCenterSelf,
-        ...csstips.width("100%"),
+        ...csstips.content,
+        maxWidth: "100%",
       },
     },
+  },
+
+  imageCaption: {
+    paddingTop: csx.px(6),
+    paddingBottom: csx.px(6),
+    color: colors.darkgray.toString(),
+    fontSize: csx.px(14),
+    marginLeft: csx.px(20),
   },
 });
 
@@ -124,9 +147,13 @@ export function renderBlock(block: BlockWithChildren, context: RenderContext) {
       return (
         <div className={css.image}>
           <img src={url} />
-          {block.image.caption
-            ? renderRichText(block.image.caption, context)
-            : void 0}
+          {block.image.caption ? (
+            <div className={css.imageCaption}>
+              {renderRichText(block.image.caption, context)}
+            </div>
+          ) : (
+            void 0
+          )}
         </div>
       );
     case "video":

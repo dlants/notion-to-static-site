@@ -1,16 +1,16 @@
 import { PageWithChildren } from "../fetch-page";
-import { RenderContext, getBreadcrumbs, getSectionPages } from "../util";
+import { RenderContext } from "../util";
 import fs from "fs";
 import path from "path";
 import { renderToString } from "react-dom/server";
 import * as React from "react";
-import { stylesheet, getStyles, classes, cssRule } from "typestyle";
+import { stylesheet, getStyles, cssRule } from "typestyle";
 import * as csstips from "csstips";
 import * as csx from "csx";
-import { favicon } from "./favicon";
 import { HEADER_HEIGHT_PX, MAX_WIDTH_PX, colors } from "./constants";
-import { pageLink, renderRichText } from "./rich-text";
+import { renderRichText } from "./rich-text";
 import { renderBlock } from "./block";
+import { renderHeader } from "./header";
 
 // see https://typestyle.github.io/#/page
 csstips.normalize();
@@ -78,13 +78,8 @@ const css = stylesheet({
   subscribe: {},
 });
 
-cssRule("figure img", {
-  ...csstips.horizontallyCenterSelf,
-  ...csstips.width("100%"),
-});
-
 cssRule("html", {
-  fontSize: "min(max(12px, 3vw), 18px);",
+  fontSize: csx.px(16),
   lineHeight: "1.5",
   $nest: {
     a: {
@@ -94,56 +89,19 @@ cssRule("html", {
   },
 });
 
-cssRule(".notion-code", {
-  background: colors.lightgray.toString(),
-  paddingLeft: csx.px(15),
-  overflow: "scroll",
-});
-
 export async function renderPage(
   page: PageWithChildren,
   context: RenderContext,
 ) {
-  const breadcrumbs = getBreadcrumbs({
-    pageId: page.id,
-    pages: context.pages,
-    blocks: context.blocks,
-  });
-  const sectionPages = getSectionPages({ pages: context.pages });
-
   const pageContent = renderToString(
     <div className={css.page}>
-      <div className={css.navHeader}>
-        <a className={css.homeImage} href="index.html">
-          {favicon}
-        </a>
-        {await Promise.all(
-          breadcrumbs.map(async (pageId, idx) => (
-            <div className={css.headerItem}>
-              {idx == 0 ? "" : ">"}
-              {pageLink(context.pages[pageId], context)}
-            </div>
-          )),
-        )}
-        <div className={css.divider} />
-        {await Promise.all(
-          sectionPages.map(async (pageId) => (
-            <div className={css.headerItem}>
-              {pageLink(context.pages[pageId], context)}
-            </div>
-          )),
-        )}
-        <div className={classes(css.headerItem, css.subscribe)}>
-          <a href="https://buttondown.email/dlants">get emails</a>
-        </div>
-      </div>
+      {renderHeader(page, context)}
       <div className={css.content}>
-        <h1>{page.properties["title"]
-        ? renderRichText(
-            (page.properties["title"] as any).title,
-            context,
-          )
-        : ""}</h1>
+        <h1>
+          {page.properties["title"]
+            ? renderRichText((page.properties["title"] as any).title, context)
+            : ""}
+        </h1>
         {page.children.map((block) => renderBlock(block, context))}
       </div>
     </div>,

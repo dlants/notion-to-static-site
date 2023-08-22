@@ -81,6 +81,10 @@ function renderRichTextElement(
     content = <span style={getStyle(item.annotations)}>{content}</span>;
   }
 
+  if (item.type == "text" && item.text.link) {
+    content = <a href={item.text.link.url}>{content}</a>;
+  }
+
   return content;
 }
 
