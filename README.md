@@ -39,18 +39,12 @@ npx tsx main.ts serve
 This will automatically re-build your site for every change you make to the code.
 
 # TODO
-stop using notion-render and write custom rendering code
-- occasionally drops blocks?!
-- respect image sizes
-- render titles when rendering page
-- fixup quote blocks
-- setup something w/ highlighting for code blocks
+generate rss/atom feeds of sub-pages & mentions for each page
+move breadcrumbs out of header
 setup inline buttondown subscribe
 backlinks
 next/previous links for posts within page
-make inline links less ugly
-generate rss/atom feeds of sub-pages & mentions for each page
-media queries for mobile styling of header
+setup something w/ highlighting for code blocks
 fixup embeds (collapsible sections, etc...)
 add automatic "next post / previous post" links for multiple pages in the same section
 add #navigation links to each title / subtitle

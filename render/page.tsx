@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import { renderToString } from "react-dom/server";
 import * as React from "react";
-import { stylesheet, getStyles, cssRule } from "typestyle";
+import { stylesheet, getStyles, cssRule, media, extend } from "typestyle";
 import * as csstips from "csstips";
 import * as csx from "csx";
 import { HEADER_HEIGHT_PX, MAX_WIDTH_PX, colors } from "./constants";
@@ -19,63 +19,37 @@ csstips.setupPage("#root");
 const css = stylesheet({
   page: {
     ...csstips.vertical,
-    alignItems: "center",
   },
 
-  navHeader: {
-    ...csstips.content,
-    ...csstips.pageTop,
+  contentContainer: {
+    marginTop: csx.px(HEADER_HEIGHT_PX),
+    ...csstips.flex,
     ...csstips.horizontal,
-    ...csstips.horizontallySpaced(10),
-    paddingRight: csx.px(15),
-    paddingLeft: csx.px(15),
-    alignItems: "flex-end",
-    paddingBottom: csx.px(10),
-    height: csx.px(HEADER_HEIGHT_PX),
-    background: colors.lightgray.toString(),
   },
 
-  headerItem: {
-    ...csstips.content,
-    $nest: {
-      a: {
-        marginLeft: "10px",
-        color: colors.black.toString(),
-        textDecoration: "none",
-        textDecorationColor: colors.lightgray.toString(),
-        $nest: {
-          "&:hover": {
-            backgroundColor: colors.lightgray.toString(),
-          },
-        },
-      },
-    },
-  },
-
-  homeImage: {
-    ...csstips.content,
-    ...csstips.horizontal,
-    alignItems: "center",
-    $nest: {
-      img: {
-        maxHeight: csx.px(30),
-      },
-    },
-  },
-
-  divider: {
+  contentPadding: {
     ...csstips.flex,
   },
 
   content: {
-    ...csstips.flex,
-    marginTop: csx.px(HEADER_HEIGHT_PX),
-    marginLeft: csx.px(20),
-    marginRight: csx.px(20),
-    maxWidth: csx.px(MAX_WIDTH_PX),
+    ...csstips.content,
+    ...extend(
+      media(
+        { minWidth: MAX_WIDTH_PX + 21 },
+        {
+          maxWidth: csx.px(MAX_WIDTH_PX),
+        },
+      ),
+      media(
+        { minWidth: 0, maxWidth: MAX_WIDTH_PX + 20 },
+        {
+          width: "100%",
+          paddingLeft: csx.px(10),
+          paddingRight: csx.px(10),
+        },
+      ),
+    ),
   },
-
-  subscribe: {},
 });
 
 cssRule("html", {
@@ -96,13 +70,19 @@ export async function renderPage(
   const pageContent = renderToString(
     <div className={css.page}>
       {renderHeader(page, context)}
-      <div className={css.content}>
-        <h1>
-          {page.properties["title"]
-            ? renderRichText((page.properties["title"] as any).title, context)
-            : ""}
-        </h1>
-        {page.children.map((block) => renderBlock(block, context))}
+      <div className={css.contentContainer}>
+        <div className={css.contentPadding} />
+
+        <div className={css.content}>
+          <h1>
+            {page.properties["title"]
+              ? renderRichText((page.properties["title"] as any).title, context)
+              : ""}
+          </h1>
+          {page.children.map((block) => renderBlock(block, context))}
+        </div>
+
+        <div className={css.contentPadding} />
       </div>
     </div>,
   );

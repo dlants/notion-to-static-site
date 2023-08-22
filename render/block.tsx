@@ -19,8 +19,9 @@ const css = stylesheet({
     },
   },
   paragraph: {
-    marginTop: csx.px(1),
-    marginBottom: csx.px(1),
+    paddingTop: csx.px(3),
+    paddingBottom: csx.px(3),
+    minHeight: csx.em(1)
   },
   childPage: {
     $nest: {
