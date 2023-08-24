@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import { NotionClientWrapper } from "./fetch-page";
 import { loadPages } from "./load-page";
 import { renderPage } from "./render/page";
+import { renderButtondown } from "./render/buttondown";
 dotenv.config();
 
 yargs
@@ -67,13 +68,15 @@ yargs
       const ROOT_PAGE_ID = normalizePageId(
         ensureEnvironmentVariable("ROOT_PAGE_ID"),
       );
-      const { pages, blocks } = await loadPages(ROOT_PAGE_ID);
+      const context = await loadPages(ROOT_PAGE_ID);
 
-      for (const pageId in pages) {
-        const page = pages[pageId];
+      for (const pageId in context.pages) {
+        const page = context.pages[pageId];
         console.log(`processing ${page.id}`);
-        await renderPage(page, { pages, blocks });
+        await renderPage(page, context);
       }
+
+      renderButtondown(context);
     },
   )
   .help().argv;

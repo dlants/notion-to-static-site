@@ -40,8 +40,6 @@ This will automatically re-build your site for every change you make to the code
 
 # TODO
 generate rss/atom feeds of sub-pages & mentions for each page
-move breadcrumbs out of header
-setup inline buttondown subscribe
 backlinks
 next/previous links for posts within page
 setup something w/ highlighting for code blocks

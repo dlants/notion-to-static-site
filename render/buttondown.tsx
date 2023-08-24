@@ -1,21 +1,14 @@
-import { PageWithChildren } from "../fetch-page";
-import { RenderContext } from "../util";
-import fs from "fs";
-import path from "path";
 import { renderToString } from "react-dom/server";
 import * as React from "react";
+import { RenderContext } from "../util";
 import { stylesheet, media, extend } from "typestyle";
 import * as csstips from "csstips";
 import * as csx from "csx";
 import { MAX_WIDTH_PX } from "./constants";
-import { renderRichText } from "./rich-text";
-import { renderBlock } from "./block";
 import { renderHeader } from "./header";
 import { pageTemplate } from "./util";
-
-// see https://typestyle.github.io/#/page
-csstips.normalize();
-csstips.setupPage("#root");
+import fs from "fs";
+import path from "path";
 
 const css = stylesheet({
   page: {
@@ -52,25 +45,40 @@ const css = stylesheet({
   },
 });
 
-export async function renderPage(
-  page: PageWithChildren,
-  context: RenderContext,
-) {
+export async function renderButtondown(context: RenderContext) {
   const pageContent = renderToString(
     <div className={css.page}>
-      {renderHeader(page, context)}
+      {renderHeader(undefined, context)}
       <div className={css.contentContainer}>
         <div className={css.contentPadding} />
 
         <div className={css.content}>
-          <h1>
-            {page.properties["title"]
-              ? renderRichText((page.properties["title"] as any).title, context)
-              : ""}
-          </h1>
-          {page.children.map((block) => renderBlock(block, context))}
-        </div>
+          <h1>Sign up for my newsletter</h1>
+          <p>Get emails when I write new posts.</p>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: `\
+<form
+  action="https://buttondown.email/api/emails/embed-subscribe/dlants"
+  method="post"
+  target="popupwindow"
+  onsubmit="window.open('https://buttondown.email/dlants', 'popupwindow')"
+  class="embeddable-buttondown-form"
+>
 
+  <label for="bd-email">Enter your email</label>
+  <input type="email" name="email" id="bd-email" />
+
+  <input type="submit" value="Subscribe" />
+  <p>
+    <a href="https://buttondown.email/refer/dlants" target="_blank"
+      >Powered by Buttondown.</a
+    >
+  </p>
+</form>`,
+            }}
+          />
+        </div>
         <div className={css.contentPadding} />
       </div>
     </div>,
@@ -78,5 +86,5 @@ export async function renderPage(
 
   const html = pageTemplate(pageContent);
 
-  fs.writeFileSync(path.join("dist", page.id + ".html"), html);
+  fs.writeFileSync(path.join("dist", "buttondown.html"), html);
 }

@@ -58,9 +58,9 @@ export type BlockMap = {
 };
 
 export type RenderContext = {
-  pages: PageMap,
-  blocks: BlockMap
-}
+  pages: PageMap;
+  blocks: BlockMap;
+};
 
 export type AssetInfo = {
   originalUrl: string;
@@ -120,7 +120,9 @@ export function getBreadcrumbs({
     switch (currentLoc.type) {
       case "pageId":
         const page = pages[currentLoc.pageId];
-        breadcrumbs.push(page.id);
+        if (page.id != "index") {
+          breadcrumbs.push(page.id);
+        }
         currentLoc = getParentLoc(page.parent);
         break;
 
@@ -162,5 +164,5 @@ export function getSectionPages({ pages }: { pages: PageMap }): PageId[] {
 }
 
 export function assertUnreachable(val: never) {
-  throw new Error(`Unexpected value: ${val}`)
+  throw new Error(`Unexpected value: ${val}`);
 }

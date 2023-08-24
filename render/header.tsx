@@ -27,7 +27,7 @@ const css = stylesheet({
     paddingLeft: csx.px(15),
     maxWidth: "100%",
     overflow: "hidden",
-    flexWrap: "nowrap"
+    flexWrap: "nowrap",
   },
 
   headerItem: {
@@ -46,8 +46,7 @@ const css = stylesheet({
     },
   },
 
-  breadcrumb: {
-  },
+  breadcrumb: {},
 
   section: {
     ...extend(media({ maxWidth: 690 }, { display: "none" })),
@@ -71,12 +70,17 @@ const css = stylesheet({
   subscribe: {},
 });
 
-export function renderHeader(page: PageWithChildren, context: RenderContext) {
-  const breadcrumbs = getBreadcrumbs({
-    pageId: page.id,
-    pages: context.pages,
-    blocks: context.blocks,
-  });
+export function renderHeader(
+  page: PageWithChildren | undefined,
+  context: RenderContext,
+) {
+  const breadcrumbs = page
+    ? getBreadcrumbs({
+        pageId: page.id,
+        pages: context.pages,
+        blocks: context.blocks,
+      })
+    : undefined;
   const sectionPages = getSectionPages({ pages: context.pages });
 
   return (
@@ -92,12 +96,12 @@ export function renderHeader(page: PageWithChildren, context: RenderContext) {
           </div>
         ))}
         <div className={classes(css.headerItem, css.subscribe)}>
-          <a href="https://buttondown.email/dlants">✉️ newsletter</a>
+          <a href="/buttondown.html">✉️ newsletter</a>
         </div>
       </div>
 
       <div className={css.headerRow}>
-        {breadcrumbs.map((pageId, idx) => (
+        {(breadcrumbs || []).map((pageId, idx) => (
           <div className={classes(css.headerItem, css.breadcrumb)}>
             {idx == 0 ? "" : " > "}
             {pageLink(context.pages[pageId], context)}
