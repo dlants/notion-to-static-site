@@ -49,6 +49,7 @@ fixup embeds (collapsible sections, etc...)
 add automatic "next post / previous post" links for multiple pages in the same section
 add #navigation links to each title / subtitle
 check the build results into the repo, set up render to mirror repo to website
+add footer, vertical space at the bottom of the page
 
 # MAYBE
 name asset files by content hash

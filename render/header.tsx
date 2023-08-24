@@ -5,28 +5,35 @@ import { stylesheet, classes, media, extend } from "typestyle";
 import * as csstips from "csstips";
 import * as csx from "csx";
 import { favicon } from "./favicon";
-import { HEADER_HEIGHT_PX, colors } from "./constants";
+import { colors } from "./constants";
 import { pageLink } from "./rich-text";
 
 const css = stylesheet({
   header: {
     ...csstips.content,
-    ...csstips.pageTop,
+    ...csstips.vertical,
+  },
+
+  topHeaderRow: {
+    background: colors.lightgray.toString(),
+  },
+
+  headerRow: {
+    ...csstips.content,
     ...csstips.horizontal,
     ...csstips.horizontallySpaced(10),
+    alignItems: "flex-end",
     paddingRight: csx.px(15),
     paddingLeft: csx.px(15),
-    alignItems: "flex-end",
-    paddingBottom: csx.px(10),
-    height: csx.px(HEADER_HEIGHT_PX),
-    background: colors.lightgray.toString(),
+    maxWidth: "100%",
+    overflow: "hidden",
+    flexWrap: "nowrap"
   },
 
   headerItem: {
     ...csstips.content,
     $nest: {
       a: {
-        marginLeft: "10px",
         color: colors.black.toString(),
         textDecoration: "none",
         textDecorationColor: colors.lightgray.toString(),
@@ -40,11 +47,10 @@ const css = stylesheet({
   },
 
   breadcrumb: {
-    ...extend(media({ maxWidth: 1200 }, { display: "none" })),
   },
 
   section: {
-    ...extend(media({ maxWidth: 800}, { display: "none" })),
+    ...extend(media({ maxWidth: 690 }, { display: "none" })),
   },
 
   homeImage: {
@@ -74,17 +80,11 @@ export function renderHeader(page: PageWithChildren, context: RenderContext) {
   const sectionPages = getSectionPages({ pages: context.pages });
 
   return (
-    <div>
-      <div className={css.header}>
+    <div className={css.header}>
+      <div className={classes(css.headerRow, css.topHeaderRow)}>
         <a className={css.homeImage} href="index.html">
           {favicon}
         </a>
-        {breadcrumbs.map((pageId, idx) => (
-          <div className={classes(css.headerItem, css.breadcrumb)}>
-            {idx == 0 ? "" : ">"}
-            {pageLink(context.pages[pageId], context)}
-          </div>
-        ))}
         <div className={css.divider} />
         {sectionPages.map((pageId) => (
           <div className={classes(css.headerItem, css.section)}>
@@ -94,6 +94,15 @@ export function renderHeader(page: PageWithChildren, context: RenderContext) {
         <div className={classes(css.headerItem, css.subscribe)}>
           <a href="https://buttondown.email/dlants">✉️ newsletter</a>
         </div>
+      </div>
+
+      <div className={css.headerRow}>
+        {breadcrumbs.map((pageId, idx) => (
+          <div className={classes(css.headerItem, css.breadcrumb)}>
+            {idx == 0 ? "" : " > "}
+            {pageLink(context.pages[pageId], context)}
+          </div>
+        ))}
       </div>
     </div>
   );

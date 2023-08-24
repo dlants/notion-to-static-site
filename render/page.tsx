@@ -7,7 +7,7 @@ import * as React from "react";
 import { stylesheet, getStyles, cssRule, media, extend } from "typestyle";
 import * as csstips from "csstips";
 import * as csx from "csx";
-import { HEADER_HEIGHT_PX, MAX_WIDTH_PX, colors } from "./constants";
+import { MAX_WIDTH_PX, colors } from "./constants";
 import { renderRichText } from "./rich-text";
 import { renderBlock } from "./block";
 import { renderHeader } from "./header";
@@ -22,7 +22,6 @@ const css = stylesheet({
   },
 
   contentContainer: {
-    marginTop: csx.px(HEADER_HEIGHT_PX),
     ...csstips.flex,
     ...csstips.horizontal,
   },
