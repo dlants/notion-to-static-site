@@ -50,6 +50,11 @@ const css = stylesheet({
       ),
     ),
   },
+
+  footer: {
+    ...csstips.content,
+    height: csx.px(300)
+  }
 });
 
 export async function renderPage(
@@ -73,6 +78,8 @@ export async function renderPage(
 
         <div className={css.contentPadding} />
       </div>
+
+      <div className={css.footer}/>
     </div>,
   );
 

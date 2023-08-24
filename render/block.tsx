@@ -1,6 +1,6 @@
 import { BlockWithChildren } from "../fetch-page";
 import * as React from "react";
-import { renderRichText, pageLink, renderRichTextToPlainText } from "./rich-text";
+import { renderRichText, renderRichTextContents, pageLink } from "./rich-text";
 import { RenderContext, assertUnreachable } from "../util";
 import { stylesheet } from "typestyle";
 import { colors } from "./constants";
@@ -21,7 +21,22 @@ const css = stylesheet({
   paragraph: {
     paddingTop: csx.px(3),
     paddingBottom: csx.px(3),
-    minHeight: csx.em(1)
+    minHeight: csx.em(1),
+  },
+  code: {
+    display: "inline-block",
+    whiteSpace: "nowrap",
+    width: "100%",
+    overflowX: "scroll",
+    "-ms-overflow-style": "none", // hide scrollbar in IE and Edge
+    scrollbarWidth: "none", // hide scrollbar in Firefox
+    $nest: {
+      "$::-webkit-scrollbar": {
+        display: "none", // hide scrollbar in Chrome
+      },
+    },
+    ...csstips.padding(csx.px(3)),
+    border: 'solid thin lightgray'
   },
   childPage: {
     $nest: {
@@ -122,6 +137,11 @@ export function renderBlock(block: BlockWithChildren, context: RenderContext) {
       // TODO: add katex?
       return block.equation.expression;
     case "code":
+      return (
+        <code className={css.code}>
+          {renderRichTextContents(block.code.rich_text, context)}
+        </code>
+      );
     case "callout":
     case "divider":
     case "breadcrumb":

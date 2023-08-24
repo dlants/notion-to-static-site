@@ -13,6 +13,7 @@ cssRule("html", {
   },
 });
 
+
 export function pageTemplate(pageContent: string) {
   return `\
 <!DOCTYPE html>

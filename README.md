@@ -39,16 +39,16 @@ This will automatically re-build your site for every change you make to the code
 browser to see the changes.
 
 # TODO
-check the build results into the repo, set up render to mirror repo to website
-split off the notion-to-static-site library into independent package from my own website
-backlinks
+put up a "latest posts" list on the front page
 next/previous links for posts within page
+backlinks
 setup something w/ highlighting for code blocks
 fixup embeds (collapsible sections, etc...)
 add automatic "next post / previous post" links for multiple pages in the same section
 add #navigation links to each title / subtitle
-add footer, vertical space at the bottom of the page
+split off the notion-to-static-site library into independent package from my own website
 generate rss/atom feeds of sub-pages & mentions for each page
+set up some analytics
 
 # MAYBE
 name asset files by content hash

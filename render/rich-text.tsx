@@ -40,7 +40,7 @@ export function renderRichTextToPlainText(richText: RichTextItemResponse[]) {
   return richText.map((item) => item.plain_text).join();
 }
 
-function renderRichTextContents(
+export function renderRichTextContents(
   richText: RichTextItemResponse[],
   context: RenderContext,
 ) {
@@ -81,8 +81,9 @@ function renderRichTextElement(
       assertUnreachable(item);
   }
 
-  if (!_.isEmpty(item.annotations)) {
-    content = <span style={getStyle(item.annotations)}>{content}</span>;
+  const itemStyles = getStyle(item.annotations);
+  if (!_.isEmpty(itemStyles)) {
+    content = <span style={itemStyles}>{content}</span>;
   }
 
   if (item.type == "text" && item.text.link) {
@@ -117,7 +118,7 @@ function getStyle(
     properties.fontFamily = "'Roboto Mono', monospace;";
   }
 
-  if (annotations.color) {
+  if (annotations.color != "default") {
     // TODO: not implemented
     console.warn("annotations.color not implemented");
   }
