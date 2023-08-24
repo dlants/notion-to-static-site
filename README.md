@@ -27,8 +27,7 @@ with `index.html` as the main entry point. You can then do with it as you like, 
 to github pages.
 
 # Hack it
-Should be easy enough to follow. The `main.ts` file has the main build command. It walks `cache/` to generate
-a graph of pages, then renders each page.
+Should be easy enough to follow. The `main.ts` file has commands that are configured via yarn.
 
 I find it useful to run these commands in two different terminals:
 ```
@@ -36,18 +35,20 @@ npx tsx watch ./main.ts build
 npx tsx main.ts serve
 ```
 
-This will automatically re-build your site for every change you make to the code.
+This will automatically re-build your site for every change you make to the code. Then you can just refresh your
+browser to see the changes.
 
 # TODO
-generate rss/atom feeds of sub-pages & mentions for each page
+check the build results into the repo, set up render to mirror repo to website
+split off the notion-to-static-site library into independent package from my own website
 backlinks
 next/previous links for posts within page
 setup something w/ highlighting for code blocks
 fixup embeds (collapsible sections, etc...)
 add automatic "next post / previous post" links for multiple pages in the same section
 add #navigation links to each title / subtitle
-check the build results into the repo, set up render to mirror repo to website
 add footer, vertical space at the bottom of the page
+generate rss/atom feeds of sub-pages & mentions for each page
 
 # MAYBE
 name asset files by content hash

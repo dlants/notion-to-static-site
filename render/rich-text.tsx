@@ -36,6 +36,10 @@ export function renderRichText(
   );
 }
 
+export function renderRichTextToPlainText(richText: RichTextItemResponse[]) {
+  return richText.map((item) => item.plain_text).join();
+}
+
 function renderRichTextContents(
   richText: RichTextItemResponse[],
   context: RenderContext,

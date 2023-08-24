@@ -1,6 +1,6 @@
 import { BlockWithChildren } from "../fetch-page";
 import * as React from "react";
-import { renderRichText, pageLink } from "./rich-text";
+import { renderRichText, pageLink, renderRichTextToPlainText } from "./rich-text";
 import { RenderContext, assertUnreachable } from "../util";
 import { stylesheet } from "typestyle";
 import { colors } from "./constants";

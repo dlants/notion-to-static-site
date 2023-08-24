@@ -95,8 +95,14 @@ export function renderHeader(
             {pageLink(context.pages[pageId], context)}
           </div>
         ))}
+
         <div className={classes(css.headerItem, css.subscribe)}>
-          <a href="/buttondown.html">✉️ newsletter</a>
+          {"| "}
+          <a href="/rss.xml">rss</a>
+          {" "}
+          <a href="/atom.xml">atom</a>
+          {" "}
+          <a href="/buttondown.html">newsletter</a>
         </div>
       </div>
 
