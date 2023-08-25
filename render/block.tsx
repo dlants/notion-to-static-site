@@ -8,6 +8,19 @@ import * as csx from "csx";
 import * as csstips from "csstips";
 
 const css = stylesheet({
+  divider: {
+    height: csx.em(1),
+    ...csstips.horizontal,
+    alignItems: "center",
+    $nest: {
+      div: {
+        ...csstips.flex,
+        width: "100%",
+        height: csx.px(1),
+        borderBottom: "1px solid " + colors.gray.toRGBA(),
+      },
+    },
+  },
   video: {
     ...csstips.vertical,
     alignItems: "center",
@@ -72,13 +85,15 @@ const css = stylesheet({
     },
   },
 
-  imageCaption: {
+  caption: {
     paddingTop: csx.px(6),
     paddingBottom: csx.px(6),
     color: colors.darkgray.toString(),
     fontSize: csx.px(14),
     marginLeft: csx.px(20),
   },
+
+  bookmark: {},
 });
 
 type Chunk =
@@ -185,12 +200,21 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
         </div>
       );
     case "heading_1":
-      // TODO: not implemented
-      // need to add toggle heading / child support
+      if (block.has_children) {
+        console.warn(`block type ${block.type} with children not implemented`);
+      }
       return <h1>{renderRichText(block.heading_1.rich_text, context)}</h1>;
     case "heading_2":
+      if (block.has_children) {
+        console.warn(`block type ${block.type} with children not implemented`);
+      }
+
       return <h2>{renderRichText(block.heading_2.rich_text, context)}</h2>;
     case "heading_3":
+      if (block.has_children) {
+        console.warn(`block type ${block.type} with children not implemented`);
+      }
+
       return <h3>{renderRichText(block.heading_3.rich_text, context)}</h3>;
     case "bulleted_list_item":
       return (
@@ -218,6 +242,7 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
     case "toggle":
     case "template":
     case "synced_block":
+      console.warn(`block type ${block.type} not implemented`);
       return <div>{block.type} not implemented</div>;
     case "child_page":
       const childPage = context.pages[block.id];
@@ -229,6 +254,7 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
         <div className={css.childPage}>{pageLink(childPage, context)}</div>
       );
     case "child_database":
+      console.warn(`block type ${block.type} not implemented`);
       return <div>{block.type} not implemented</div>;
     case "equation":
       // TODO: add katex?
@@ -239,8 +265,13 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
           {renderRichTextContents(block.code.rich_text, context)}
         </code>
       );
-    case "callout":
     case "divider":
+      return (
+        <div className={css.divider}>
+          <div />
+        </div>
+      );
+    case "callout":
     case "breadcrumb":
     case "table_of_contents":
     case "column_list":
@@ -249,8 +280,20 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
     case "table":
     case "table_row":
     case "embed":
-    case "bookmark":
       return <div>{block.type} not implemented</div>;
+    case "bookmark":
+      return (
+        <div className={css.bookmark}>
+          <a href={block.bookmark.url}>{block.bookmark.url}</a>
+          {block.bookmark.caption ? (
+            <div className={css.caption}>
+              {renderRichText(block.bookmark.caption, context)}
+            </div>
+          ) : (
+            void 0
+          )}
+        </div>
+      );
     case "image":
       if (block.image.type != "external") {
         console.warn(
@@ -266,7 +309,7 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
         <div className={css.image}>
           <img src={url} />
           {block.image.caption ? (
-            <div className={css.imageCaption}>
+            <div className={css.caption}>
               {renderRichText(block.image.caption, context)}
             </div>
           ) : (
@@ -299,6 +342,7 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
         );
       }
 
+      console.warn(`block type ${block.type} not implemented`);
       return <div>{block.type} not implemented</div>;
 
     case "pdf":
@@ -306,6 +350,7 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
     case "audio":
     case "link_preview":
     case "unsupported":
+      console.warn(`block type ${block.type} not implemented`);
       return <div>{block.type} not implemented</div>;
     default:
       assertUnreachable(block);
