@@ -36,7 +36,7 @@ const css = stylesheet({
       },
     },
     ...csstips.padding(csx.px(3)),
-    border: 'solid thin lightgray'
+    border: "solid thin lightgray",
   },
   childPage: {
     $nest: {
@@ -81,9 +81,102 @@ const css = stylesheet({
   },
 });
 
+type Chunk =
+  | {
+      type: "singleBlock";
+      block: BlockWithChildren;
+    }
+  | {
+      type: "numberedList";
+      blocks: BlockWithChildren[];
+    }
+  | {
+      type: "bulletList";
+      blocks: BlockWithChildren[];
+    };
+
+export function renderBlocks(
+  blockList: BlockWithChildren[],
+  context: RenderContext,
+) {
+  let currentChunk: Chunk | undefined;
+  const remainingBlockList = blockList.slice().reverse();
+  const output: (React.JSX.Element | string | undefined)[] = [];
+
+  function renderChunk() {
+    if (!currentChunk) {
+      return;
+    }
+
+    switch (currentChunk.type) {
+      case "singleBlock":
+        output.push(renderBlock(currentChunk.block, context));
+        return;
+      case "numberedList":
+        output.push(
+          <ol>{currentChunk.blocks.map((b) => renderBlock(b, context))}</ol>,
+        );
+        return;
+      case "bulletList":
+        output.push(
+          <ul>{currentChunk.blocks.map((b) => renderBlock(b, context))}</ul>,
+        );
+        return;
+      default:
+        assertUnreachable(currentChunk);
+    }
+
+    currentChunk = undefined;
+  }
+
+  while (true) {
+    const block = remainingBlockList.pop();
+
+    if (!block) {
+      renderChunk();
+      break;
+    }
+
+    switch (block.type) {
+      case "numbered_list_item":
+        if (currentChunk && currentChunk.type == "numberedList") {
+          currentChunk.blocks.push(block);
+        } else {
+          renderChunk();
+          currentChunk = {
+            type: "numberedList",
+            blocks: [block],
+          };
+        }
+        break;
+
+      case "bulleted_list_item":
+        if (currentChunk && currentChunk.type == "bulletList") {
+          currentChunk.blocks.push(block);
+        } else {
+          renderChunk();
+          currentChunk = {
+            type: "bulletList",
+            blocks: [block],
+          };
+        }
+        break;
+
+      default:
+        renderChunk();
+        currentChunk = {
+          type: "singleBlock",
+          block,
+        };
+    }
+  }
+
+  return output;
+}
+
 /** See: https://developers.notion.com/reference/block
  */
-export function renderBlock(block: BlockWithChildren, context: RenderContext) {
+function renderBlock(block: BlockWithChildren, context: RenderContext) {
   switch (block.type) {
     case "paragraph":
       return (
@@ -101,20 +194,24 @@ export function renderBlock(block: BlockWithChildren, context: RenderContext) {
       return <h3>{renderRichText(block.heading_3.rich_text, context)}</h3>;
     case "bulleted_list_item":
       return (
-        <ul>
-          <li>
-            {renderRichText(block.bulleted_list_item.rich_text, context)}
-            {(block.children || []).map((child) => renderBlock(child, context))}
-          </li>
-        </ul>
+        <li>
+          {renderRichText(block.bulleted_list_item.rich_text, context)}
+          {block.children ? renderBlocks(block.children, context) : undefined}
+        </li>
       );
     case "numbered_list_item":
-      return <div>{block.type} not implemented</div>;
+      return (
+        <li>
+          {renderRichText(block.numbered_list_item.rich_text, context)}
+          {block.children ? renderBlocks(block.children, context) : undefined}
+        </li>
+      );
+
     case "quote":
       return (
         <blockquote className={css.quote}>
           {renderRichText(block.quote.rich_text, context)}
-          {(block.children || []).map((child) => renderBlock(child, context))}
+          {block.children ? renderBlocks(block.children, context) : undefined}
         </blockquote>
       );
     case "to_do":

@@ -9,7 +9,7 @@ import * as csstips from "csstips";
 import * as csx from "csx";
 import { MAX_WIDTH_PX } from "./constants";
 import { renderRichText } from "./rich-text";
-import { renderBlock } from "./block";
+import { renderBlocks } from "./block";
 import { renderHeader } from "./header";
 import { pageTemplate } from "./util";
 
@@ -53,8 +53,8 @@ const css = stylesheet({
 
   footer: {
     ...csstips.content,
-    height: csx.px(300)
-  }
+    height: csx.px(300),
+  },
 });
 
 export async function renderPage(
@@ -73,13 +73,13 @@ export async function renderPage(
               ? renderRichText((page.properties["title"] as any).title, context)
               : ""}
           </h1>
-          {page.children.map((block) => renderBlock(block, context))}
+          {renderBlocks(page.children, context)}
         </div>
 
         <div className={css.contentPadding} />
       </div>
 
-      <div className={css.footer}/>
+      <div className={css.footer} />
     </div>,
   );
 

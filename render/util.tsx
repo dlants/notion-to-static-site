@@ -10,9 +10,37 @@ cssRule("html", {
       color: colors.darkgray.toString(),
       textDecorationColor: colors.darkgray.toString(),
     },
+    ol: {
+      listStyleType: "decimal",
+      $nest: {
+        ol: {
+          listStyleType: "lower-alpha",
+          $nest: {
+            ol: {
+              listStyleType: "lower-roman",
+              $nest: {
+                ol: {
+                  listStyleType: "decimal",
+                  $nest: {
+                    ol: {
+                      listStyleType: "lower-alpha",
+                      $nest: {
+                        ol: {
+                          listStyleType: "lower-roman",
+                          // 6 layers deep should be enough
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
 });
-
 
 export function pageTemplate(pageContent: string) {
   return `\
