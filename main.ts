@@ -38,14 +38,21 @@ yargs
   .command(
     "fetch",
     "query the notion api for updates to the page",
-    {},
-    async (_argv) => {
+    {
+      clearCache: {
+        describe: "re-download all pages?",
+        type: "boolean",
+      },
+    },
+    async (argv) => {
       const NOTION_API_TOKEN = ensureEnvironmentVariable("NOTION_API_TOKEN");
       const ROOT_PAGE_ID = ensureEnvironmentVariable("ROOT_PAGE_ID");
       const client = new NotionClientWrapper(NOTION_API_TOKEN);
 
-      await $`rm -rf cache`;
-      await $`mkdir -p cache/images`;
+      if (argv.clearCache) {
+        await $`rm -rf cache`;
+        await $`mkdir -p cache/images`;
+      }
       await client.fetchPageAndChildren({
         pageId: ROOT_PAGE_ID,
       });
@@ -54,12 +61,7 @@ yargs
   .command(
     "build",
     "take the content in the export directory and build it, placing the result in the dist directory",
-    {
-      forceDownload: {
-        describe: "re-download all absolute assets?",
-        type: "boolean",
-      },
-    },
+    {},
     async (_argv) => {
       await $`rm -rf dist`;
       await $`mkdir -p dist/images`;

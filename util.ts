@@ -2,6 +2,7 @@ import { BlockWithChildren, PageWithChildren } from "./fetch-page";
 
 export type BlockId = string;
 export type PageId = string;
+export type DatabaseId = string;
 
 /** BFS traversal of all the blocks in the page, without re-visiting the same block **/
 export function* walkChildrenBFS(page: PageWithChildren) {

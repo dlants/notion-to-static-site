@@ -39,15 +39,17 @@ This will automatically re-build your site for every change you make to the code
 browser to see the changes.
 
 # TODO
+abstract out dlants.me-specific stuff into nested package that can be published and consumed separately
+possibly set up a faster way to fetch updates for quicker testing and iteration speed
 put up a "latest posts" list on the front page
 next/previous links for posts within page
 backlinks
 setup something w/ highlighting for code blocks
 fixup embeds (collapsible sections, etc...)
-add automatic "next post / previous post" links for multiple pages in the same section
 add #navigation links to each title / subtitle
 split off the notion-to-static-site library into independent package from my own website
 generate rss/atom feeds of sub-pages & mentions for each page
+add icons for rss, email, page anchors, etc...
 set up some analytics
 
 # MAYBE
