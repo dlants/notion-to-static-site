@@ -20,6 +20,7 @@ export type BlockId = string;
 export type PageId = string;
 export type TagId = string;
 export type DatabaseId = string;
+export type PropertyId = string;
 
 /** BFS traversal of all the blocks in the page, without re-visiting the same block **/
 export function* walkChildrenBFS(page: PageWithChildren) {
@@ -209,7 +210,7 @@ export function getSectionPages({ pages }: { pages: PageMap }): PageId[] {
   return sections.reverse();
 }
 
-export function assertUnreachable(val: never) {
+export function assertUnreachable(val: never): never {
   throw new Error(`Unexpected value: ${val}`);
 }
 
@@ -234,7 +235,7 @@ export type MultiSelectDbProperty = SelectProperty<
   "multi_select"
 >;
 
-export type Tags = MultiSelectDbProperty['multi_select']['options']
+export type Tags = MultiSelectDbProperty["multi_select"]["options"];
 
 export type DatePageProperty = SelectProperty<
   PageObjectResponse["properties"]["key"],
@@ -253,7 +254,7 @@ export type FileLocation =
       feedType?: "rss" | "atom";
     };
 
-export function getFilePath(loc: FileLocation) {
+export function getFilePath(loc: FileLocation): string {
   switch (loc.type) {
     case "page":
       return loc.pageId + ".html";
@@ -263,6 +264,6 @@ export function getFilePath(loc: FileLocation) {
       }`;
 
     default:
-      assertUnreachable(loc);
+      return assertUnreachable(loc);
   }
 }

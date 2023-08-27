@@ -254,7 +254,7 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
         <div className={css.childPage}>{pageLink(childPage, context)}</div>
       );
     case "child_database":
-      return renderDbBlock(block.id, context);
+      return renderDbBlock(block.id, {}, context);
 
     case "equation":
       // TODO: add katex?

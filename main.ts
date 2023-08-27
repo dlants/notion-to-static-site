@@ -9,7 +9,7 @@ import { loadPages } from "./load-page";
 import { renderPage } from "./render/page";
 import { renderButtondown } from "./render/buttondown";
 import { renderFeeds } from "./render/feed";
-import { renderDbPage } from "./render/database";
+import { renderDbPages } from "./render/database";
 dotenv.config();
 
 yargs
@@ -82,7 +82,7 @@ yargs
 
       for (const databaseId in context.dbs) {
         console.log(`processing ${databaseId}`);
-        renderDbPage(databaseId, context);
+        renderDbPages(databaseId, context);
       }
 
       renderButtondown(context);

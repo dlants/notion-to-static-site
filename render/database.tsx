@@ -8,6 +8,9 @@ import {
   getFilePath,
   MultiSelectDbProperty,
   Tags,
+  PropertyId,
+  TagId,
+  DatePageProperty,
 } from "../util";
 import { pageLayout } from "./util";
 import { renderHeader } from "./header";
@@ -52,17 +55,59 @@ const css = stylesheet({
   },
 });
 
-export function renderDbBlock(databaseId: DatabaseId, context: RenderContext) {
-  const db = context.dbs[databaseId];
-  const pages = db.children.map((pageId) => context.pages[pageId]);
+export type DbRenderOptions = {
+  /** Sort the db rows by a particular property?
+   * Right now only "date" type is supported.
+   */
+  sort?: {
+    propertyId: PropertyId;
+    direction: "ascending" | "descending";
+  };
+  filterTagId?: TagId;
+};
 
-  const allTags = getDbTags(db);
+export function renderDbBlock(
+  databaseId: DatabaseId,
+  options: DbRenderOptions,
+  context: RenderContext,
+) {
+  const db = context.dbs[databaseId];
+  let pages = db.children.map((pageId) => context.pages[pageId]);
+  if (options.filterTagId) {
+    pages = pages.filter((page) => {
+      const pageTags = getTags(page);
+      return _.some(
+        pageTags?.multi_select,
+        (tag) => tag.id == options.filterTagId,
+      );
+    });
+  }
+
+  if (options.sort?.propertyId) {
+    const sort = options.sort;
+    pages = _.sortBy(pages, (page) => {
+      const publisehdDateProp = _.find(
+        _.values(page.properties),
+        (prop): prop is DatePageProperty => prop.id == sort.propertyId,
+      );
+      return (
+        (sort.direction == "ascending" ? 1 : -1) *
+        new Date(publisehdDateProp?.date?.start || 0).getTime()
+      );
+    });
+  }
+
+  let allTags = getDbTags(db)?.multi_select.options;
+  if (options.filterTagId) {
+    allTags = allTags?.filter((t) => t.id == options.filterTagId);
+  }
+
   const title = renderRichTextContents(db.title, context);
   return (
     <div className={css.db}>
       <div className={css.dbTitleRow}>
         <span className={css.dbTitle}>{title}</span>
-        {allTags ? renderTags(databaseId, allTags.multi_select.options) : ""}
+        {allTags ? renderTags(databaseId, allTags) : ""}
       </div>
       <div className={css.dbRowContainer}>
         {pages.map((p) => renderPageRow(databaseId, p, context))}
@@ -71,14 +116,45 @@ export function renderDbBlock(databaseId: DatabaseId, context: RenderContext) {
   );
 }
 
-export function renderDbPage(databaseId: DatabaseId, context: RenderContext) {
+export function renderDbPages(databaseId: DatabaseId, context: RenderContext) {
   const db = context.dbs[databaseId];
+
   const header = renderHeader(db, context);
-  const content = [renderDbBlock(databaseId, context)];
 
+  const content = [renderDbBlock(databaseId, {}, context)];
   const html = pageLayout({ header, content });
+  fs.writeFileSync(
+    path.join(
+      "dist",
+      getFilePath({
+        type: "db",
+        databaseId,
+      }),
+    ),
+    html,
+  );
 
-  fs.writeFileSync(path.join("dist", db.id + ".html"), html);
+  // render a page for each tag
+  const tags = getDbTags(db)?.multi_select.options;
+  for (const tag of tags || []) {
+    const content = [
+      renderDbBlock(databaseId, { filterTagId: tag.id }, context),
+    ];
+    const html = pageLayout({ header, content });
+    const outPath = path.join(
+      "dist",
+      getFilePath({
+        type: "db",
+        databaseId,
+        tagFilter: tag.id,
+      }),
+    );
+
+    fs.mkdirSync(path.dirname(outPath), {
+      recursive: true,
+    });
+    fs.writeFileSync(outPath, html);
+  }
 }
 
 function getDbTags(db: DatabaseWithChildren) {
@@ -110,14 +186,13 @@ function renderPageRow(
 }
 
 function renderTags(databaseId: DatabaseId, tags: Tags) {
-  debugger;
   return tags.map((tag) => (
     <a
       className={css.tag}
       style={{
         background: NOTION_BACKGROUND_COLORS[tag.color].toString(),
       }}
-      href={getFilePath({ type: "db", databaseId, tagFilter: tag.id })}
+      href={"/" + getFilePath({ type: "db", databaseId, tagFilter: tag.id })}
     >
       {tag.name}
     </a>

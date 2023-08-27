@@ -1,13 +1,12 @@
-import {
-  RichTextItemResponse,
-} from "@notionhq/client/build/src/api-endpoints";
+import { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
 import * as React from "react";
 import {
   RenderContext,
   assertUnreachable,
   PageWithChildren,
   DatabaseWithChildren,
-  TitlePageProperty
+  TitlePageProperty,
+  getFilePath,
 } from "../util";
 import { stylesheet } from "typestyle";
 import { COLORS } from "./constants";
@@ -140,7 +139,10 @@ export function pageLink(page: PageWithChildren, context: RenderContext) {
   );
 
   return (
-    <a className={css.pageLink} href={page.id + ".html"}>
+    <a
+      className={css.pageLink}
+      href={"/" + getFilePath({ type: "page", pageId: page.id })}
+    >
       {title ? renderRichTextContents(title.title, context) : ""}
     </a>
   );
@@ -148,7 +150,10 @@ export function pageLink(page: PageWithChildren, context: RenderContext) {
 
 export function databaseLink(db: DatabaseWithChildren, context: RenderContext) {
   return (
-    <a className={css.pageLink} href={db.id + ".html"}>
+    <a
+      className={css.pageLink}
+      href={"/" + getFilePath({ type: "db", databaseId: db.id })}
+    >
       {renderRichTextContents(db.title, context)}
     </a>
   );
