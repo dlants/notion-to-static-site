@@ -159,9 +159,7 @@ export function getBreadcrumbs(
     switch (currentLoc.type) {
       case "pageId":
         const page = context.pages[currentLoc.pageId];
-        if (page.id != "index") {
-          breadcrumbs.push({ type: "page", pageId: page.id });
-        }
+        breadcrumbs.push({ type: "page", pageId: page.id });
         currentLoc = getParentLoc(page.parent);
         break;
 

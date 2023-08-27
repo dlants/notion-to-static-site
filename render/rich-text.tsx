@@ -11,6 +11,7 @@ import {
 import { stylesheet } from "typestyle";
 import { COLORS } from "./constants";
 import _ from "lodash";
+import { siteConfig } from "../config";
 
 const css = stylesheet({
   mention: {
@@ -143,7 +144,11 @@ export function pageLink(page: PageWithChildren, context: RenderContext) {
       className={css.pageLink}
       href={"/" + getFilePath({ type: "page", pageId: page.id })}
     >
-      {title ? renderRichTextContents(title.title, context) : ""}
+      {page.id == "index"
+        ? siteConfig.homeName
+        : title
+        ? renderRichTextContents(title.title, context)
+        : "[Untitled Page]"}
     </a>
   );
 }

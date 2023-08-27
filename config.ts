@@ -5,6 +5,10 @@ export type SiteConfig = {
    */
   rootPageId: string,
 
+  /** This string will appear in the header next to the favicon, and in the breadcrumbs.
+   */
+  homeName: string,
+
   /** Location of the favicon file. Should be an svg file in the static directory.
    */
   faviconPath: string,
@@ -21,6 +25,7 @@ export type SiteConfig = {
 
 export const siteConfig: SiteConfig = {
   rootPageId: 'ef63da75f05145d49829963c2d1f929f',
+  homeName: 'dlants.me',
   faviconPath: 'static/black-rectangle.svg',
   defaultDbSort: {
     propertyName: 'Publish Date',

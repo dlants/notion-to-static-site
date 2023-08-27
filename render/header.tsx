@@ -13,6 +13,7 @@ import * as csx from "csx";
 import { favicon } from "./favicon";
 import { COLORS } from "./constants";
 import { databaseLink, pageLink } from "./rich-text";
+import { siteConfig } from "../config";
 
 const css = stylesheet({
   header: {
@@ -58,9 +59,11 @@ const css = stylesheet({
     ...extend(media({ maxWidth: 690 }, { display: "none" })),
   },
 
-  homeImage: {
+  homeLink: {
     ...csstips.content,
     ...csstips.horizontal,
+    ...csstips.horizontallySpaced(10),
+    textDecoration: 'none',
     alignItems: "center",
     $nest: {
       img: {
@@ -86,8 +89,9 @@ export function renderHeader(
   return (
     <div className={css.header}>
       <div className={classes(css.headerRow, css.topHeaderRow)}>
-        <a className={css.homeImage} href="index.html">
+        <a className={css.homeLink} href="index.html">
           {favicon}
+          <span>{siteConfig.homeName}</span>
         </a>
         <div className={css.divider} />
         {sectionPages.map((pageId) => (
