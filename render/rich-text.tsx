@@ -1,5 +1,4 @@
 import {
-  PageObjectResponse,
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import * as React from "react";
@@ -8,21 +7,22 @@ import {
   assertUnreachable,
   PageWithChildren,
   DatabaseWithChildren,
+  TitlePageProperty
 } from "../util";
 import { stylesheet } from "typestyle";
-import { colors } from "./constants";
+import { COLORS } from "./constants";
 import _ from "lodash";
 
 const css = stylesheet({
   mention: {
     $nest: {
       a: {
-        color: colors.black.toString(),
+        color: COLORS.black.toString(),
         fontWeight: "bold",
-        textDecorationColor: colors.lightgray.toString(),
+        textDecorationColor: COLORS.lightgray.toString(),
         $nest: {
           "&:hover": {
-            backgroundColor: colors.lightgray.toString(),
+            backgroundColor: COLORS.lightgray.toString(),
           },
         },
       },
@@ -133,16 +133,10 @@ function getStyle(
   return properties;
 }
 
-// *** Typescript magic ***
-// see: https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#inferring-within-conditional-types
-type GenericProperty = PageObjectResponse["properties"]["key"];
-type SelectTitle<Type> = Type extends { type: "title" } ? Type : never;
-type TitleProperty = SelectTitle<GenericProperty>;
-
 export function pageLink(page: PageWithChildren, context: RenderContext) {
   const title = _.find(
     _.values(page.properties),
-    (p): p is TitleProperty => p.type == "title",
+    (p): p is TitlePageProperty => p.type == "title",
   );
 
   return (

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { getStyles, cssRule, stylesheet, media, extend } from "typestyle";
-import { colors } from "./constants";
+import { COLORS } from "./constants";
 import * as csstips from "csstips";
 import * as csx from "csx";
 import { renderToString } from "react-dom/server";
@@ -51,8 +51,8 @@ cssRule("html", {
   lineHeight: "1.5",
   $nest: {
     a: {
-      color: colors.darkgray.toString(),
-      textDecorationColor: colors.darkgray.toString(),
+      color: COLORS.darkgray.toString(),
+      textDecorationColor: COLORS.darkgray.toString(),
     },
     ol: {
       listStyleType: "decimal",

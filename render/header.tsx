@@ -11,7 +11,7 @@ import { stylesheet, classes, media, extend } from "typestyle";
 import * as csstips from "csstips";
 import * as csx from "csx";
 import { favicon } from "./favicon";
-import { colors } from "./constants";
+import { COLORS } from "./constants";
 import { databaseLink, pageLink } from "./rich-text";
 
 const css = stylesheet({
@@ -21,7 +21,7 @@ const css = stylesheet({
   },
 
   topHeaderRow: {
-    background: colors.lightgray.toString(),
+    background: COLORS.lightgray.toString(),
   },
 
   headerRow: {
@@ -40,12 +40,12 @@ const css = stylesheet({
     ...csstips.content,
     $nest: {
       a: {
-        color: colors.black.toString(),
+        color: COLORS.black.toString(),
         textDecoration: "none",
-        textDecorationColor: colors.lightgray.toString(),
+        textDecorationColor: COLORS.lightgray.toString(),
         $nest: {
           "&:hover": {
-            backgroundColor: colors.lightgray.toString(),
+            backgroundColor: COLORS.lightgray.toString(),
           },
         },
       },

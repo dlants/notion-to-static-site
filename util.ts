@@ -18,6 +18,7 @@ export type DatabaseWithChildren = DatabaseObjectResponse & {
 
 export type BlockId = string;
 export type PageId = string;
+export type TagId = string;
 export type DatabaseId = string;
 
 /** BFS traversal of all the blocks in the page, without re-visiting the same block **/
@@ -210,4 +211,58 @@ export function getSectionPages({ pages }: { pages: PageMap }): PageId[] {
 
 export function assertUnreachable(val: never) {
   throw new Error(`Unexpected value: ${val}`);
+}
+
+// *** Typescript magic ***
+// see: https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#inferring-within-conditional-types
+type SelectProperty<Type, Selector> = Type extends { type: Selector }
+  ? Type
+  : never;
+
+export type TitlePageProperty = SelectProperty<
+  PageObjectResponse["properties"]["key"],
+  "title"
+>;
+
+export type MultiSelectPageProperty = SelectProperty<
+  PageObjectResponse["properties"]["key"],
+  "multi_select"
+>;
+
+export type MultiSelectDbProperty = SelectProperty<
+  DatabaseObjectResponse["properties"]["key"],
+  "multi_select"
+>;
+
+export type Tags = MultiSelectDbProperty['multi_select']['options']
+
+export type DatePageProperty = SelectProperty<
+  PageObjectResponse["properties"]["key"],
+  "date"
+>;
+
+export type FileLocation =
+  | {
+      type: "page";
+      pageId: PageId;
+    }
+  | {
+      type: "db";
+      databaseId: DatabaseId;
+      tagFilter?: TagId;
+      feedType?: "rss" | "atom";
+    };
+
+export function getFilePath(loc: FileLocation) {
+  switch (loc.type) {
+    case "page":
+      return loc.pageId + ".html";
+    case "db":
+      return `${loc.databaseId}${loc.tagFilter ? `/${loc.tagFilter}` : ""}.${
+        loc.feedType ? loc.feedType : "html"
+      }`;
+
+    default:
+      assertUnreachable(loc);
+  }
 }

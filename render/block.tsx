@@ -2,7 +2,7 @@ import * as React from "react";
 import { renderRichText, renderRichTextContents, pageLink } from "./rich-text";
 import { BlockWithChildren, RenderContext, assertUnreachable } from "../util";
 import { stylesheet } from "typestyle";
-import { colors } from "./constants";
+import { COLORS } from "./constants";
 import * as csx from "csx";
 import * as csstips from "csstips";
 import { renderDbBlock } from "./database";
@@ -17,7 +17,7 @@ const css = stylesheet({
         ...csstips.flex,
         width: "100%",
         height: csx.px(1),
-        borderBottom: "1px solid " + colors.gray.toRGBA(),
+        borderBottom: "1px solid " + COLORS.gray.toRGBA(),
       },
     },
   },
@@ -54,12 +54,12 @@ const css = stylesheet({
   childPage: {
     $nest: {
       a: {
-        color: colors.black.toString(),
+        color: COLORS.black.toString(),
         fontWeight: "bold",
-        textDecorationColor: colors.lightgray.toString(),
+        textDecorationColor: COLORS.lightgray.toString(),
         $nest: {
           "&:hover": {
-            backgroundColor: colors.lightgray.toString(),
+            backgroundColor: COLORS.lightgray.toString(),
           },
         },
       },
@@ -67,7 +67,7 @@ const css = stylesheet({
   },
   quote: {
     borderLeft: csx.border({
-      color: colors.darkgray.toString(),
+      color: COLORS.darkgray.toString(),
       style: "solid",
       width: csx.px(2),
     }),
@@ -88,7 +88,7 @@ const css = stylesheet({
   caption: {
     paddingTop: csx.px(6),
     paddingBottom: csx.px(6),
-    color: colors.darkgray.toString(),
+    color: COLORS.darkgray.toString(),
     fontSize: csx.px(14),
     marginLeft: csx.px(20),
   },
