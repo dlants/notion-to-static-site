@@ -9,6 +9,7 @@ import { loadPages } from "./load-page";
 import { renderPage } from "./render/page";
 import { renderButtondown } from "./render/buttondown";
 import { renderDbPages } from "./render/database";
+import { siteConfig } from "./config";
 dotenv.config();
 
 yargs
@@ -46,7 +47,6 @@ yargs
     },
     async (argv) => {
       const NOTION_API_TOKEN = ensureEnvironmentVariable("NOTION_API_TOKEN");
-      const ROOT_PAGE_ID = ensureEnvironmentVariable("ROOT_PAGE_ID");
       const client = new NotionClientWrapper(NOTION_API_TOKEN);
 
       if (argv.clearCache) {
@@ -54,7 +54,7 @@ yargs
         await $`mkdir -p cache/images`;
       }
       await client.fetchPageAndChildren({
-        pageId: ROOT_PAGE_ID,
+        pageId: siteConfig.rootPageId,
       });
     },
   )
@@ -68,10 +68,10 @@ yargs
       await $`cp -f -r static/* dist`;
       await $`cp -f -r cache/images/* dist/images/`;
 
-      const ROOT_PAGE_ID = normalizePageId(
-        ensureEnvironmentVariable("ROOT_PAGE_ID"),
+      const rootPageId = normalizePageId(
+        siteConfig.rootPageId
       );
-      const context = await loadPages(ROOT_PAGE_ID);
+      const context = await loadPages(rootPageId);
 
       for (const pageId in context.pages) {
         const page = context.pages[pageId];

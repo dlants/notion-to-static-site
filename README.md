@@ -8,18 +8,16 @@ create a `.env` file in the root of this project and add the following contents:
 
 ```
 NOTION_API_TOKEN=<your token>
-ROOT_PAGE_ID=<the page id that will be the root of your site>
 ```
+
+Update the `config.ts` file with values that are relevant to you.
 
 Run:
 ```
 npm install
-# will fetch all of the pages and contents of your root page and put them in the /cache directory
-npx tsx main.ts fetch
-# will traverse your cache directory and render them as html into the /dist directory
-npx tsx main.ts build
-# will serve your /dist directory locally
-npx tsx main.ts serve
+npx tsx main.ts fetch # will fetch all of the pages and contents of your root page and put them in the /cache directory
+npx tsx main.ts build # will traverse your cache directory and render them as html into the /dist directory
+npx tsx main.ts serve # will serve your /dist directory locally
 ```
 
 Navigate to `localhost:1337`. You'll be able to see your site! The static html is placed into the `dist` directory,
