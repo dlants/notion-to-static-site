@@ -13,7 +13,7 @@ dotenv.config();
 
 yargs
   .command(
-    "serve [port]",
+    "serve ",
     "serve the site locally",
     (yargs) => {
       yargs.positional("port", {

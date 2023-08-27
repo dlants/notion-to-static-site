@@ -4,7 +4,7 @@
         <title>dlants.me</title>
         <link>https://dlants.me</link>
         <description>Writing about things that I feel like writing about</description>
-        <lastBuildDate>Sun, 27 Aug 2023 21:06:38 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 27 Aug 2023 21:22:18 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>awesome</generator>
         <language>en</language>
@@ -22,19 +22,28 @@
         <category>Ed-Tech</category>
         <atom:link href="https://dlants.me/rss" rel="self" type="application/rss+xml"/>
         <item>
-            <title><![CDATA[Tao of Software Engineering 2]]></title>
-            <link>https://dlants.me/78cb06df-0af6-4a50-93f2-56bd41b8233d.html</link>
-            <guid>78cb06df-0af6-4a50-93f2-56bd41b8233d</guid>
-            <pubDate>Sat, 12 Aug 2023 23:36:00 GMT</pubDate>
+            <title><![CDATA[The greatest mystery in ed-tech]]></title>
+            <link>https://dlants.me/8548b7aa-07b8-4718-b52d-6cb19f2219df.html</link>
+            <guid>8548b7aa-07b8-4718-b52d-6cb19f2219df</guid>
+            <pubDate>Fri, 11 Aug 2023 05:31:00 GMT</pubDate>
             <description><![CDATA[Read the full post at dlants.me]]></description>
             <content:encoded><![CDATA[Read the full post at dlants.me]]></content:encoded>
             <author>mail@mail.dlants.me (Denis Lantsman)</author>
         </item>
         <item>
-            <title><![CDATA[The greatest mystery in ed-tech]]></title>
-            <link>https://dlants.me/8548b7aa-07b8-4718-b52d-6cb19f2219df.html</link>
-            <guid>8548b7aa-07b8-4718-b52d-6cb19f2219df</guid>
-            <pubDate>Fri, 11 Aug 2023 05:31:00 GMT</pubDate>
+            <title><![CDATA[Heroes: Exploring humanity through dog training.]]></title>
+            <link>https://dlants.me/00b8ed55-cdfe-4e61-b719-318ef04ee22f.html</link>
+            <guid>00b8ed55-cdfe-4e61-b719-318ef04ee22f</guid>
+            <pubDate>Sat, 12 Aug 2023 23:31:00 GMT</pubDate>
+            <description><![CDATA[Read the full post at dlants.me]]></description>
+            <content:encoded><![CDATA[Read the full post at dlants.me]]></content:encoded>
+            <author>mail@mail.dlants.me (Denis Lantsman)</author>
+        </item>
+        <item>
+            <title><![CDATA[Tao of Software Engineering 2]]></title>
+            <link>https://dlants.me/78cb06df-0af6-4a50-93f2-56bd41b8233d.html</link>
+            <guid>78cb06df-0af6-4a50-93f2-56bd41b8233d</guid>
+            <pubDate>Sat, 12 Aug 2023 23:36:00 GMT</pubDate>
             <description><![CDATA[Read the full post at dlants.me]]></description>
             <content:encoded><![CDATA[Read the full post at dlants.me]]></content:encoded>
             <author>mail@mail.dlants.me (Denis Lantsman)</author>
@@ -53,15 +62,6 @@
             <link>https://dlants.me/a5154783-1489-4cd8-b5fd-f1f6ebb71867.html</link>
             <guid>a5154783-1489-4cd8-b5fd-f1f6ebb71867</guid>
             <pubDate>Mon, 21 Aug 2023 22:58:00 GMT</pubDate>
-            <description><![CDATA[Read the full post at dlants.me]]></description>
-            <content:encoded><![CDATA[Read the full post at dlants.me]]></content:encoded>
-            <author>mail@mail.dlants.me (Denis Lantsman)</author>
-        </item>
-        <item>
-            <title><![CDATA[Heroes: Exploring humanity through dog training.]]></title>
-            <link>https://dlants.me/00b8ed55-cdfe-4e61-b719-318ef04ee22f.html</link>
-            <guid>00b8ed55-cdfe-4e61-b719-318ef04ee22f</guid>
-            <pubDate>Sat, 12 Aug 2023 23:31:00 GMT</pubDate>
             <description><![CDATA[Read the full post at dlants.me]]></description>
             <content:encoded><![CDATA[Read the full post at dlants.me]]></content:encoded>
             <author>mail@mail.dlants.me (Denis Lantsman)</author>

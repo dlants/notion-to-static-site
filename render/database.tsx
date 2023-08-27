@@ -23,6 +23,7 @@ import path from "path";
 import _ from "lodash";
 import { NOTION_BACKGROUND_COLORS } from "./constants";
 import { renderDbFeed } from "./feed";
+import { siteConfig } from "../config";
 
 const css = stylesheet({
   db: {
@@ -136,15 +137,30 @@ export function getPagesForDb(
     });
   }
 
-  if (options.sort?.propertyId) {
-    const sort = options.sort;
+  let sort: DbRenderOptions["sort"] | undefined;
+  if (options.sort) {
+    sort = options.sort;
+  } else {
+    const propertyName = siteConfig.defaultDbSort.propertyName;
+    if (db.properties[propertyName]) {
+      sort = {
+        propertyId: db.properties[propertyName].id,
+        direction: siteConfig.defaultDbSort.direction,
+      };
+    }
+  }
+
+  if (sort) {
+    // to make the typechecker believe us that this will stay defined
+    const definedSort = sort;
+
     pages = _.sortBy(pages, (page) => {
       const publisehdDateProp = _.find(
         _.values(page.properties),
-        (prop): prop is DatePageProperty => prop.id == sort.propertyId,
+        (prop): prop is DatePageProperty => prop.id == definedSort.propertyId,
       );
       return (
-        (sort.direction == "ascending" ? 1 : -1) *
+        (definedSort.direction == "ascending" ? 1 : -1) *
         new Date(publisehdDateProp?.date?.start || 0).getTime()
       );
     });
