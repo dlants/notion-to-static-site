@@ -244,11 +244,17 @@ export type FileLocation =
       feedType?: "rss" | "atom";
     };
 
-export function getPageTitleProperty(page: PageWithChildren) {
-  return _.find(
+export function getPageTitleProperty(page: PageWithChildren): TitlePageProperty | undefined {
+  const title = _.find(
     _.values(page.properties),
     (p): p is TitlePageProperty => p.type == "title",
   );
+
+  if (title) {
+    return title
+  }
+
+  return page.properties['title'] as TitlePageProperty;
 }
 
 export function getFilePath(loc: FileLocation): string {

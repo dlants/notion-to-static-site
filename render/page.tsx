@@ -1,4 +1,4 @@
-import { RenderContext, PageWithChildren } from "../util";
+import { RenderContext, PageWithChildren, getPageTitleProperty } from "../util";
 import fs from "fs";
 import path from "path";
 import * as React from "react";
@@ -17,11 +17,12 @@ export function renderPage(
   context: RenderContext,
 ) {
   const header = renderHeader(page, context);
+  const titleProperty = getPageTitleProperty(page);
   const content = [
     <h1>
-      {page.properties["title"]
-        ? renderRichText((page.properties["title"] as any).title, context)
-        : ""}
+      {titleProperty
+        ? renderRichText(titleProperty.title, context)
+        : "[Untitled Page]"}
     </h1>,
     ...renderBlocks(page.children, context),
   ];
