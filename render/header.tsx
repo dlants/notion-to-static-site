@@ -1,7 +1,6 @@
 import {
   RenderContext,
   getBreadcrumbs,
-  getSectionPages,
   PageWithChildren,
   assertUnreachable,
   DatabaseWithChildren,
@@ -64,7 +63,7 @@ const css = stylesheet({
     ...csstips.content,
     ...csstips.horizontal,
     ...csstips.horizontallySpaced(10),
-    textDecoration: 'none',
+    textDecoration: "none",
     alignItems: "center",
     $nest: {
       img: {
@@ -101,10 +100,14 @@ export function renderHeader(
           </div>
         ))}
 
-        <div className={classes(css.headerItem, css.subscribe)}>
-          {"| "}
-          <a href="/buttondown.html">newsletter</a>
-        </div>
+        {siteConfig.buttondownId ? (
+          <div className={classes(css.headerItem, css.subscribe)}>
+            {"| "}
+            <a href="/buttondown.html">newsletter</a>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
 
       <div className={css.headerRow}>

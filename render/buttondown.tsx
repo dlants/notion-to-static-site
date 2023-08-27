@@ -9,6 +9,7 @@ import { renderHeader } from "./header";
 import { pageTemplate } from "./util";
 import fs from "fs";
 import path from "path";
+import { siteConfig } from "../config";
 
 const css = stylesheet({
   page: {
@@ -59,10 +60,10 @@ export async function renderButtondown(context: RenderContext) {
             dangerouslySetInnerHTML={{
               __html: `\
 <form
-  action="https://buttondown.email/api/emails/embed-subscribe/dlants"
+  action="https://buttondown.email/api/emails/embed-subscribe/${siteConfig.buttondownId}"
   method="post"
   target="popupwindow"
-  onsubmit="window.open('https://buttondown.email/dlants', 'popupwindow')"
+  onsubmit="window.open('https://buttondown.email/${siteConfig.buttondownId}', 'popupwindow')"
   class="embeddable-buttondown-form"
 >
 
@@ -71,7 +72,7 @@ export async function renderButtondown(context: RenderContext) {
 
   <input type="submit" value="Subscribe" />
   <p>
-    <a href="https://buttondown.email/refer/dlants" target="_blank"
+    <a href="https://buttondown.email/refer/${siteConfig.buttondownId}" target="_blank"
       >Powered by Buttondown.</a
     >
   </p>

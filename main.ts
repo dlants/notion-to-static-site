@@ -75,7 +75,9 @@ yargs
         renderDbPages(databaseId, context);
       }
 
-      renderButtondown(context);
+      if (siteConfig.buttondownId) {
+        renderButtondown(context);
+      }
     },
   )
   .help().argv;
