@@ -34,7 +34,7 @@ To set up, a similar system, do the following:
 1. fork this repo into your own github account
 2. set up a render [static site](https://render.com/docs/static-sites)
 3. in the static site settings, add the `.env` secret file, and populate it with your `NOTION_API_TOKEN`.
-4. in the static site settings, set the build command to be `build.sh`
+4. in the static site settings, set the build command to be `./build.sh`
 
 Now, every time you merge into your main branch, the build will automatically run. When you update your source page
 in notion, you can go to your render dashboard and manually trigger a build. It will fetch the latest changes & update

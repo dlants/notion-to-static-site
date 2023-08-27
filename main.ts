@@ -39,20 +39,13 @@ yargs
   .command(
     "fetch",
     "query the notion api for updates to the page",
-    {
-      clearCache: {
-        describe: "re-download all pages?",
-        type: "boolean",
-      },
-    },
-    async (argv) => {
+    {},
+    async (_argv) => {
       const NOTION_API_TOKEN = ensureEnvironmentVariable("NOTION_API_TOKEN");
       const client = new NotionClientWrapper(NOTION_API_TOKEN);
 
-      if (argv.clearCache) {
-        await $`rm -rf cache`;
-        await $`mkdir -p cache/images`;
-      }
+      await $`rm -rf cache`;
+      await $`mkdir -p cache/images`;
       await client.fetchPageAndChildren({
         pageId: siteConfig.rootPageId,
       });
@@ -68,9 +61,7 @@ yargs
       await $`cp -f -r static/* dist`;
       await $`cp -f -r cache/images/* dist/images/`;
 
-      const rootPageId = normalizePageId(
-        siteConfig.rootPageId
-      );
+      const rootPageId = normalizePageId(siteConfig.rootPageId);
       const context = await loadPages(rootPageId);
 
       for (const pageId in context.pages) {
