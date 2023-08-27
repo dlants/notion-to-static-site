@@ -3,6 +3,7 @@ import {
   DatabaseObjectResponse,
   PageObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
+import _ from "lodash";
 
 export type BlockWithChildren = BlockObjectResponse & {
   children?: BlockWithChildren[];
@@ -254,13 +255,20 @@ export type FileLocation =
       feedType?: "rss" | "atom";
     };
 
+export function getPageTitleProperty(page: PageWithChildren) {
+  return _.find(
+    _.values(page.properties),
+    (p): p is TitlePageProperty => p.type == "title",
+  );
+}
+
 export function getFilePath(loc: FileLocation): string {
   switch (loc.type) {
     case "page":
       return loc.pageId + ".html";
     case "db":
-      return `${loc.databaseId}${loc.tagFilter ? `/${loc.tagFilter}` : ""}.${
-        loc.feedType ? loc.feedType : "html"
+      return `${loc.databaseId}${loc.tagFilter ? `/${loc.tagFilter}` : ""}${
+        loc.feedType ? "." + loc.feedType + ".xml" : ".html"
       }`;
 
     default:

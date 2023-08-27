@@ -1,11 +1,21 @@
 import { Feed } from "feed";
-import { RenderContext } from "../util";
+import {
+  DatabaseId,
+  RenderContext,
+  getFilePath,
+  getPageTitleProperty,
+} from "../util";
 import _ from "lodash";
 import { renderRichTextToPlainText } from "./rich-text";
 import fs from "fs";
 import path from "path";
+import { DbRenderOptions, getPagesForDb } from "./database";
 
-export function renderFeeds(context: RenderContext) {
+export function renderDbFeed(
+  databaseId: DatabaseId,
+  options: DbRenderOptions,
+  context: RenderContext,
+) {
   const feed = new Feed({
     title: "dlants.me",
     description: "Writing about things that I feel like writing about",
@@ -31,19 +41,20 @@ export function renderFeeds(context: RenderContext) {
     (c) => feed.addCategory(c),
   );
 
-  const pages = _.sortBy(_.values(context.pages), (page) => {
-    return new Date(page.created_time).getTime();
-  });
+  const { pages } = getPagesForDb(databaseId, options, context);
 
   for (const page of pages) {
     if (page.id == "index") {
       continue;
     }
 
+    const pageTitleProperty = getPageTitleProperty(page);
+    const pageTitle = pageTitleProperty
+      ? renderRichTextToPlainText(pageTitleProperty.title)
+      : "[Untitled]";
+
     feed.addItem({
-      title: page.properties["title"]
-        ? renderRichTextToPlainText((page.properties["title"] as any).title)
-        : "",
+      title: pageTitle,
       id: page.id,
       link: `https://dlants.me/${page.id}.html`,
       description: "Read the full post at dlants.me",
@@ -59,7 +70,28 @@ export function renderFeeds(context: RenderContext) {
     });
   }
 
-  fs.writeFileSync(path.join("dist", "rss.xml"), feed.rss2());
-  fs.writeFileSync(path.join("dist", "atom.xml"), feed.atom1());
-  fs.writeFileSync(path.join("dist", "json1.json"), feed.json1());
+  fs.writeFileSync(
+    path.join(
+      "dist",
+      getFilePath({
+        type: "db",
+        databaseId,
+        tagFilter: options.filterTagId,
+        feedType: "rss",
+      }),
+    ),
+    feed.rss2(),
+  );
+  fs.writeFileSync(
+    path.join(
+      "dist",
+      getFilePath({
+        type: "db",
+        databaseId,
+        tagFilter: options.filterTagId,
+        feedType: "atom",
+      }),
+    ),
+    feed.rss2(),
+  );
 }

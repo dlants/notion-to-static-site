@@ -8,7 +8,6 @@ import { NotionClientWrapper } from "./fetch-page";
 import { loadPages } from "./load-page";
 import { renderPage } from "./render/page";
 import { renderButtondown } from "./render/buttondown";
-import { renderFeeds } from "./render/feed";
 import { renderDbPages } from "./render/database";
 dotenv.config();
 
@@ -86,7 +85,6 @@ yargs
       }
 
       renderButtondown(context);
-      renderFeeds(context);
     },
   )
   .help().argv;

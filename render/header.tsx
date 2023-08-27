@@ -98,7 +98,6 @@ export function renderHeader(
 
         <div className={classes(css.headerItem, css.subscribe)}>
           {"| "}
-          <a href="/rss.xml">rss</a> <a href="/atom.xml">atom</a>{" "}
           <a href="/buttondown.html">newsletter</a>
         </div>
       </div>

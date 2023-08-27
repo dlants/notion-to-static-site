@@ -22,6 +22,7 @@ import fs from "fs";
 import path from "path";
 import _ from "lodash";
 import { NOTION_BACKGROUND_COLORS } from "./constants";
+import { renderDbFeed } from "./feed";
 
 const css = stylesheet({
   db: {
@@ -53,6 +54,9 @@ const css = stylesheet({
     height: csx.em(1.2),
     borderRadius: csx.px(3),
   },
+  feedLink: {
+    ...csstips.content,
+  },
 });
 
 export type DbRenderOptions = {
@@ -67,6 +71,55 @@ export type DbRenderOptions = {
 };
 
 export function renderDbBlock(
+  databaseId: DatabaseId,
+  options: DbRenderOptions,
+  context: RenderContext,
+) {
+  const db = context.dbs[databaseId];
+  const { pages, tags: allTags } = getPagesForDb(databaseId, options, context);
+  const title = renderRichTextContents(db.title, context);
+  return (
+    <div className={css.db}>
+      <div className={css.dbTitleRow}>
+        <span className={css.dbTitle}>{title}</span>
+        {allTags ? renderTags(databaseId, allTags) : ""}
+        <a
+          className={css.feedLink}
+          href={
+            "/" +
+            getFilePath({
+              type: "db",
+              databaseId,
+              tagFilter: options.filterTagId,
+              feedType: "rss",
+            })
+          }
+        >
+          rss
+        </a>{" "}
+        <a
+          className={css.feedLink}
+          href={
+            "/" +
+            getFilePath({
+              type: "db",
+              databaseId,
+              tagFilter: options.filterTagId,
+              feedType: "rss",
+            })
+          }
+        >
+          atom
+        </a>
+      </div>
+      <div className={css.dbRowContainer}>
+        {pages.map((p) => renderPageRow(databaseId, p, context))}
+      </div>
+    </div>
+  );
+}
+
+export function getPagesForDb(
   databaseId: DatabaseId,
   options: DbRenderOptions,
   context: RenderContext,
@@ -97,30 +150,18 @@ export function renderDbBlock(
     });
   }
 
-  let allTags = getDbTags(db)?.multi_select.options;
+  let tags = getDbTags(db)?.multi_select.options;
   if (options.filterTagId) {
-    allTags = allTags?.filter((t) => t.id == options.filterTagId);
+    tags = tags?.filter((t) => t.id == options.filterTagId);
   }
 
-  const title = renderRichTextContents(db.title, context);
-  return (
-    <div className={css.db}>
-      <div className={css.dbTitleRow}>
-        <span className={css.dbTitle}>{title}</span>
-        {allTags ? renderTags(databaseId, allTags) : ""}
-      </div>
-      <div className={css.dbRowContainer}>
-        {pages.map((p) => renderPageRow(databaseId, p, context))}
-      </div>
-    </div>
-  );
+  return { pages, tags };
 }
 
 export function renderDbPages(databaseId: DatabaseId, context: RenderContext) {
   const db = context.dbs[databaseId];
 
   const header = renderHeader(db, context);
-
   const content = [renderDbBlock(databaseId, {}, context)];
   const html = pageLayout({ header, content });
   fs.writeFileSync(
@@ -133,6 +174,7 @@ export function renderDbPages(databaseId: DatabaseId, context: RenderContext) {
     ),
     html,
   );
+  renderDbFeed(databaseId, {}, context);
 
   // render a page for each tag
   const tags = getDbTags(db)?.multi_select.options;
@@ -154,6 +196,8 @@ export function renderDbPages(databaseId: DatabaseId, context: RenderContext) {
       recursive: true,
     });
     fs.writeFileSync(outPath, html);
+
+    renderDbFeed(databaseId, { filterTagId: tag.id }, context);
   }
 }
 

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>dlants.me</title>
+        <link>https://dlants.me</link>
+        <description>Writing about things that I feel like writing about</description>
+        <lastBuildDate>Sun, 27 Aug 2023 21:06:38 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>awesome</generator>
+        <language>en</language>
+        <image>
+            <title>dlants.me</title>
+            <url>https://dlants.me/black-rectangle.svg</url>
+            <link>https://dlants.me</link>
+        </image>
+        <copyright>All rights reserved, 2023, Denis Lantsman</copyright>
+        <category>Technology</category>
+        <category>Education</category>
+        <category>Climbing</category>
+        <category>Training</category>
+        <category>Tech</category>
+        <category>Ed-Tech</category>
+        <atom:link href="https://dlants.me/rss" rel="self" type="application/rss+xml"/>
+        <item>
+            <title><![CDATA[The greatest mystery in ed-tech]]></title>
+            <link>https://dlants.me/8548b7aa-07b8-4718-b52d-6cb19f2219df.html</link>
+            <guid>8548b7aa-07b8-4718-b52d-6cb19f2219df</guid>
+            <pubDate>Fri, 11 Aug 2023 05:31:00 GMT</pubDate>
+            <description><![CDATA[Read the full post at dlants.me]]></description>
+            <content:encoded><![CDATA[Read the full post at dlants.me]]></content:encoded>
+            <author>mail@mail.dlants.me (Denis Lantsman)</author>
+        </item>
+        <item>
+            <title><![CDATA[SFUSD Algebra 1 re-take Statistics]]></title>
+            <link>https://dlants.me/8929c352-06d2-47ba-9ca6-1b789789f7a8.html</link>
+            <guid>8929c352-06d2-47ba-9ca6-1b789789f7a8</guid>
+            <pubDate>Sat, 12 Aug 2023 23:32:00 GMT</pubDate>
+            <description><![CDATA[Read the full post at dlants.me]]></description>
+            <content:encoded><![CDATA[Read the full post at dlants.me]]></content:encoded>
+            <author>mail@mail.dlants.me (Denis Lantsman)</author>
+        </item>
+    </channel>
+</rss>
