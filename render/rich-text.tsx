@@ -1,10 +1,12 @@
-import { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
+import {
+  PageObjectResponse,
+  RichTextItemResponse,
+} from "@notionhq/client/build/src/api-endpoints";
 import * as React from "react";
-import { RenderContext, assertUnreachable } from "../util";
+import { RenderContext, assertUnreachable, PageWithChildren } from "../util";
 import { stylesheet } from "typestyle";
 import { colors } from "./constants";
 import _ from "lodash";
-import { PageWithChildren } from "../fetch-page";
 
 const css = stylesheet({
   mention: {
@@ -126,15 +128,21 @@ function getStyle(
   return properties;
 }
 
+// *** Typescript magic ***
+// see: https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#inferring-within-conditional-types
+type GenericProperty = PageObjectResponse["properties"]["key"];
+type SelectTitle<Type> = Type extends { type: "title" } ? Type : never;
+type TitleProperty = SelectTitle<GenericProperty>;
+
 export function pageLink(page: PageWithChildren, context: RenderContext) {
+  const title = _.find(
+    _.values(page.properties),
+    (p): p is TitleProperty => p.type == "title",
+  );
+
   return (
     <a className={css.pageLink} href={page.id + ".html"}>
-      {page.properties["title"]
-        ? renderRichTextContents(
-            (page.properties["title"] as any).title,
-            context,
-          )
-        : ""}
+      {title ? renderRichTextContents(title.title, context) : ""}
     </a>
   );
 }

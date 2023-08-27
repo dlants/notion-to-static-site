@@ -1,4 +1,20 @@
-import { BlockWithChildren, PageWithChildren } from "./fetch-page";
+import {
+  BlockObjectResponse,
+  DatabaseObjectResponse,
+  PageObjectResponse,
+} from "@notionhq/client/build/src/api-endpoints";
+
+export type BlockWithChildren = BlockObjectResponse & {
+  children?: BlockWithChildren[];
+};
+
+export type PageWithChildren = PageObjectResponse & {
+  children: BlockWithChildren[];
+};
+
+export type DatabaseWithChildren = DatabaseObjectResponse & {
+  children: PageId[];
+};
 
 export type BlockId = string;
 export type PageId = string;
@@ -54,6 +70,10 @@ export type PageMap = {
   [pageId: PageId]: PageWithChildren;
 };
 
+export type DatabaseMap = {
+  [databaseId: DatabaseId]: DatabaseWithChildren;
+};
+
 export type BlockMap = {
   [blockId: BlockId]: BlockWithChildren;
 };
@@ -61,6 +81,7 @@ export type BlockMap = {
 export type RenderContext = {
   pages: PageMap;
   blocks: BlockMap;
+  dbs: DatabaseMap;
 };
 
 export type AssetInfo = {

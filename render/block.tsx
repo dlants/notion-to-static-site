@@ -1,11 +1,11 @@
-import { BlockWithChildren } from "../fetch-page";
 import * as React from "react";
 import { renderRichText, renderRichTextContents, pageLink } from "./rich-text";
-import { RenderContext, assertUnreachable } from "../util";
+import { BlockWithChildren, RenderContext, assertUnreachable } from "../util";
 import { stylesheet } from "typestyle";
 import { colors } from "./constants";
 import * as csx from "csx";
 import * as csstips from "csstips";
+import { renderDb } from "./database";
 
 const css = stylesheet({
   divider: {
@@ -254,8 +254,8 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
         <div className={css.childPage}>{pageLink(childPage, context)}</div>
       );
     case "child_database":
-      console.warn(`block type ${block.type} not implemented`);
-      return <div>{block.type} not implemented</div>;
+      return renderDb(block.id, context);
+
     case "equation":
       // TODO: add katex?
       return block.equation.expression;

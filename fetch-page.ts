@@ -1,9 +1,7 @@
 import { Client, isFullBlock, iteratePaginatedAPI } from "@notionhq/client";
 import {
-  BlockObjectResponse,
   GetDatabaseResponse,
   GetPageResponse,
-  PageObjectResponse,
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import fs from "fs";
@@ -12,16 +10,14 @@ import * as stream from "stream";
 import { promisify } from "util";
 import axios from "axios";
 import url from "url";
-import { BlockId, DatabaseId, PageId, assertUnreachable } from "./util";
+import {
+  BlockId,
+  DatabaseId,
+  BlockWithChildren,
+  PageId,
+  assertUnreachable,
+} from "./util";
 const finished = promisify(stream.finished);
-
-export type BlockWithChildren = BlockObjectResponse & {
-  children?: BlockWithChildren[];
-};
-
-export type PageWithChildren = PageObjectResponse & {
-  children: BlockWithChildren[];
-};
 
 type NodeToVisit =
   | { type: "page"; pageId: PageId }
@@ -95,7 +91,7 @@ export class NotionClientWrapper {
       path.join("cache", page.id + ".json"),
       JSON.stringify({ ...page, children }, null, 2),
     );
-    console.log(`wrote page ${page.id}`)
+    console.log(`wrote page ${page.id}`);
     this.visitedNodes.add(page.id);
   }
 
@@ -110,7 +106,7 @@ export class NotionClientWrapper {
       path.join("cache", db.id + ".json"),
       JSON.stringify(db, null, 2),
     );
-    console.log(`wrote db ${db.id}`)
+    console.log(`wrote db ${db.id}`);
     this.visitedNodes.add(db.id);
   }
 

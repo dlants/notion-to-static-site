@@ -1,5 +1,4 @@
-import { PageWithChildren } from "../fetch-page";
-import { RenderContext, getBreadcrumbs, getSectionPages } from "../util";
+import { RenderContext, getBreadcrumbs, getSectionPages, PageWithChildren } from "../util";
 import * as React from "react";
 import { stylesheet, classes, media, extend } from "typestyle";
 import * as csstips from "csstips";

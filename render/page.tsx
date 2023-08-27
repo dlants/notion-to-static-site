@@ -1,5 +1,4 @@
-import { PageWithChildren } from "../fetch-page";
-import { RenderContext } from "../util";
+import { RenderContext, PageWithChildren } from "../util";
 import fs from "fs";
 import path from "path";
 import { renderToString } from "react-dom/server";
