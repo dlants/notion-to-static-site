@@ -1,11 +1,18 @@
-import { RenderContext, getBreadcrumbs, getSectionPages, PageWithChildren } from "../util";
+import {
+  RenderContext,
+  getBreadcrumbs,
+  getSectionPages,
+  PageWithChildren,
+  assertUnreachable,
+  DatabaseWithChildren,
+} from "../util";
 import * as React from "react";
 import { stylesheet, classes, media, extend } from "typestyle";
 import * as csstips from "csstips";
 import * as csx from "csx";
 import { favicon } from "./favicon";
 import { colors } from "./constants";
-import { pageLink } from "./rich-text";
+import { databaseLink, pageLink } from "./rich-text";
 
 const css = stylesheet({
   header: {
@@ -70,16 +77,10 @@ const css = stylesheet({
 });
 
 export function renderHeader(
-  page: PageWithChildren | undefined,
+  node: PageWithChildren | DatabaseWithChildren | undefined,
   context: RenderContext,
 ) {
-  const breadcrumbs = page
-    ? getBreadcrumbs({
-        pageId: page.id,
-        pages: context.pages,
-        blocks: context.blocks,
-      })
-    : undefined;
+  const breadcrumbs = node ? getBreadcrumbs(node.id, context) : undefined;
   const sectionPages = getSectionPages({ pages: context.pages });
 
   return (
@@ -97,21 +98,32 @@ export function renderHeader(
 
         <div className={classes(css.headerItem, css.subscribe)}>
           {"| "}
-          <a href="/rss.xml">rss</a>
-          {" "}
-          <a href="/atom.xml">atom</a>
-          {" "}
+          <a href="/rss.xml">rss</a> <a href="/atom.xml">atom</a>{" "}
           <a href="/buttondown.html">newsletter</a>
         </div>
       </div>
 
       <div className={css.headerRow}>
-        {(breadcrumbs || []).map((pageId, idx) => (
-          <div className={classes(css.headerItem, css.breadcrumb)}>
-            {idx == 0 ? "" : " > "}
-            {pageLink(context.pages[pageId], context)}
-          </div>
-        ))}
+        {(breadcrumbs || []).map((breadcrumb, idx) => {
+          switch (breadcrumb.type) {
+            case "page":
+              return (
+                <div className={classes(css.headerItem, css.breadcrumb)}>
+                  {idx == 0 ? "" : " > "}
+                  {pageLink(context.pages[breadcrumb.pageId], context)}
+                </div>
+              );
+            case "database":
+              return (
+                <div className={classes(css.headerItem, css.breadcrumb)}>
+                  {idx == 0 ? "" : " > "}
+                  {databaseLink(context.dbs[breadcrumb.databaseId], context)}
+                </div>
+              );
+            default:
+              assertUnreachable(breadcrumb);
+          }
+        })}
       </div>
     </div>
   );

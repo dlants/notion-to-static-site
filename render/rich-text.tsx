@@ -3,7 +3,12 @@ import {
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import * as React from "react";
-import { RenderContext, assertUnreachable, PageWithChildren } from "../util";
+import {
+  RenderContext,
+  assertUnreachable,
+  PageWithChildren,
+  DatabaseWithChildren,
+} from "../util";
 import { stylesheet } from "typestyle";
 import { colors } from "./constants";
 import _ from "lodash";
@@ -143,6 +148,14 @@ export function pageLink(page: PageWithChildren, context: RenderContext) {
   return (
     <a className={css.pageLink} href={page.id + ".html"}>
       {title ? renderRichTextContents(title.title, context) : ""}
+    </a>
+  );
+}
+
+export function databaseLink(db: DatabaseWithChildren, context: RenderContext) {
+  return (
+    <a className={css.pageLink} href={db.id + ".html"}>
+      {renderRichTextContents(db.title, context)}
     </a>
   );
 }

@@ -1,6 +1,50 @@
-import { getStyles, cssRule } from "typestyle";
+import * as React from "react";
+import { getStyles, cssRule, stylesheet, media, extend } from "typestyle";
 import { colors } from "./constants";
+import * as csstips from "csstips";
 import * as csx from "csx";
+import { renderToString } from "react-dom/server";
+import { MAX_WIDTH_PX } from "./constants";
+
+const css = stylesheet({
+  page: {
+    ...csstips.vertical,
+  },
+
+  contentContainer: {
+    ...csstips.flex,
+    ...csstips.horizontal,
+  },
+
+  contentPadding: {
+    ...csstips.flex,
+  },
+
+  content: {
+    ...csstips.content,
+    ...extend(
+      media(
+        { minWidth: MAX_WIDTH_PX + 21 },
+        {
+          maxWidth: csx.px(MAX_WIDTH_PX),
+        },
+      ),
+      media(
+        { minWidth: 0, maxWidth: MAX_WIDTH_PX + 20 },
+        {
+          width: "100%",
+          paddingLeft: csx.px(10),
+          paddingRight: csx.px(10),
+        },
+      ),
+    ),
+  },
+
+  footer: {
+    ...csstips.content,
+    height: csx.px(300),
+  },
+});
 
 cssRule("html", {
   fontSize: csx.px(16),
@@ -41,6 +85,31 @@ cssRule("html", {
     },
   },
 });
+
+export function pageLayout({
+  header,
+  content,
+}: {
+  header: JSX.Element;
+  content: (string | JSX.Element | undefined)[];
+}) {
+  const pageContent = renderToString(
+    <div className={css.page}>
+      {header}
+      <div className={css.contentContainer}>
+        <div className={css.contentPadding} />
+
+        <div className={css.content}>{...content}</div>
+
+        <div className={css.contentPadding} />
+      </div>
+
+      <div className={css.footer} />
+    </div>,
+  );
+
+  return pageTemplate(pageContent);
+}
 
 export function pageTemplate(pageContent: string) {
   return `\

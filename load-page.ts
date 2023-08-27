@@ -25,7 +25,7 @@ export async function loadPages(rootPageId: string): Promise<RenderContext> {
       } else {
         dbs[node.id] = {
           ...node,
-          children: []
+          children: [],
         };
       }
     } else {
@@ -39,34 +39,37 @@ export async function loadPages(rootPageId: string): Promise<RenderContext> {
 
   for (const pageId in pages) {
     const page = pages[pageId];
-    if (page.parent.type == 'database_id') {
+    if (page.parent.type == "database_id") {
       const db = dbs[page.parent.database_id];
       if (!db) {
-        throw new Error(`Page ${pageId} is child of db ${page.parent.database_id} but that db is not loaded.`)
+        throw new Error(
+          `Page ${pageId} is child of db ${page.parent.database_id} but that db is not loaded.`,
+        );
       }
 
       db.children.push(page.id);
     }
   }
 
-  remapId({ oldPageId: rootPageId, newPageId: "index", pages });
-
   const blocks = generateBlockMap({ pages });
+  const context = { pages, blocks, dbs };
 
-  return { pages, blocks, dbs };
+  remapId({ oldPageId: rootPageId, newPageId: "index", context });
+
+  return context;
 }
 
 function remapId({
   oldPageId,
   newPageId,
-  pages,
+  context,
 }: {
   oldPageId: string;
   newPageId: string;
-  pages: PageMap;
+  context: RenderContext;
 }) {
-  for (const pageId in pages) {
-    const page = pages[pageId];
+  for (const pageId in context.pages) {
+    const page = context.pages[pageId];
     if (page.parent.type == "page_id" && page.parent.page_id == oldPageId) {
       page.parent.page_id = newPageId;
     }
@@ -78,7 +81,18 @@ function remapId({
     }
   }
 
-  const page = pages[oldPageId];
+  for (const dbId in context.dbs) {
+    const db = context.dbs[dbId];
+    if (db.parent.type == "page_id" && db.parent.page_id == oldPageId) {
+      db.parent.page_id = newPageId;
+    }
+
+    db.children = db.children.map((pageId) =>
+      pageId == oldPageId ? newPageId : pageId,
+    );
+  }
+
+  const page = context.pages[oldPageId];
   page.id = newPageId;
   for (const block of walkChildrenBFS(page)) {
     if (block.parent.type == "page_id" && block.parent.page_id == oldPageId) {
@@ -86,6 +100,6 @@ function remapId({
     }
   }
 
-  pages[newPageId] = page;
-  delete pages[oldPageId];
+  context.pages[newPageId] = page;
+  delete context.pages[oldPageId];
 }

@@ -125,31 +125,51 @@ export function generateBlockMap({ pages }: { pages: PageMap }): BlockMap {
   return blockMap;
 }
 
-export function getBreadcrumbs({
-  pageId,
-  pages,
-  blocks,
-}: {
-  pageId: PageId;
-  pages: PageMap;
-  blocks: BlockMap;
-}) {
-  const breadcrumbs: PageId[] = [];
+export type Breadcrumb =
+  | {
+      type: "page";
+      pageId: PageId;
+    }
+  | {
+      type: "database";
+      databaseId: DatabaseId;
+    };
 
-  let currentLoc: Loc | undefined = { type: "pageId", pageId };
+export function getBreadcrumbs(
+  nodeId: PageId | DatabaseId,
+  context: RenderContext,
+): Breadcrumb[] {
+  const breadcrumbs: Breadcrumb[] = [];
+
+  let currentLoc: Loc | undefined;
+  if (context.pages[nodeId]) {
+    currentLoc = { type: "pageId", pageId: nodeId };
+  } else if (context.dbs[nodeId]) {
+    currentLoc = { type: "databaseId", databaseId: nodeId };
+  } else {
+    throw new Error(
+      `Must find breadcrumb for page or db id, but ${nodeId} was neither`,
+    );
+  }
 
   while (currentLoc) {
     switch (currentLoc.type) {
       case "pageId":
-        const page = pages[currentLoc.pageId];
+        const page = context.pages[currentLoc.pageId];
         if (page.id != "index") {
-          breadcrumbs.push(page.id);
+          breadcrumbs.push({ type: "page", pageId: page.id });
         }
         currentLoc = getParentLoc(page.parent);
         break;
 
+      case "databaseId":
+        const db = context.dbs[currentLoc.databaseId];
+        breadcrumbs.push({ type: "database", databaseId: db.id });
+        currentLoc = getParentLoc(db.parent);
+        break;
+
       case "blockId":
-        const block = blocks[currentLoc.blockId];
+        const block = context.blocks[currentLoc.blockId];
         currentLoc = getParentLoc(block.parent);
         break;
     }
@@ -160,6 +180,7 @@ export function getBreadcrumbs({
 
 type Loc =
   | { type: "pageId"; pageId: PageId }
+  | { type: "databaseId"; databaseId: DatabaseId }
   | { type: "blockId"; blockId: BlockId };
 
 function getParentLoc(
@@ -169,6 +190,8 @@ function getParentLoc(
     return { type: "pageId", pageId: parent.page_id };
   } else if (parent.type == "block_id") {
     return { type: "blockId", blockId: parent.block_id };
+  } else if (parent.type == "database_id") {
+    return { type: "databaseId", databaseId: parent.database_id };
   } else {
     return undefined;
   }

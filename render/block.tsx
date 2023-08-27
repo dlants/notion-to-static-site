@@ -5,7 +5,7 @@ import { stylesheet } from "typestyle";
 import { colors } from "./constants";
 import * as csx from "csx";
 import * as csstips from "csstips";
-import { renderDb } from "./database";
+import { renderDbBlock } from "./database";
 
 const css = stylesheet({
   divider: {
@@ -254,7 +254,7 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
         <div className={css.childPage}>{pageLink(childPage, context)}</div>
       );
     case "child_database":
-      return renderDb(block.id, context);
+      return renderDbBlock(block.id, context);
 
     case "equation":
       // TODO: add katex?
