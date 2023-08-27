@@ -5,6 +5,7 @@ import {
   PageWithChildren,
   assertUnreachable,
   DatabaseWithChildren,
+  normalizePageId,
 } from "../util";
 import * as React from "react";
 import { stylesheet, classes, media, extend } from "typestyle";
@@ -84,7 +85,7 @@ export function renderHeader(
   context: RenderContext,
 ) {
   const breadcrumbs = node ? getBreadcrumbs(node.id, context) : undefined;
-  const sectionPages = getSectionPages({ pages: context.pages });
+  const sectionPages = siteConfig.headerPageIds.map(normalizePageId);
 
   return (
     <div className={css.header}>

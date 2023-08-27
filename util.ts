@@ -198,17 +198,6 @@ function getParentLoc(
   }
 }
 
-export function getSectionPages({ pages }: { pages: PageMap }): PageId[] {
-  const sections = [];
-  const indexPage = pages["index"];
-  for (const block of walkChildrenBFS(indexPage)) {
-    if (block.type == "child_page") {
-      sections.push(block.id);
-    }
-  }
-  return sections.reverse();
-}
-
 export function assertUnreachable(val: never): never {
   throw new Error(`Unexpected value: ${val}`);
 }
