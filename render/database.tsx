@@ -61,14 +61,12 @@ const css = stylesheet({
 });
 
 export type DbRenderOptions = {
-  /** Sort the db rows by a particular property?
-   * Right now only "date" type is supported.
-   */
-  sort?: {
-    propertyId: PropertyId;
-    direction: "ascending" | "descending";
-  };
   filterTagId?: TagId;
+};
+
+export type SortOption = {
+  propertyId: PropertyId;
+  direction: "ascending" | "descending";
 };
 
 export function renderDbBlock(
@@ -137,33 +135,43 @@ export function getPagesForDb(
     });
   }
 
-  let sort: DbRenderOptions["sort"] | undefined;
-  if (options.sort) {
-    sort = options.sort;
-  } else {
-    const propertyName = siteConfig.defaultDbSort.propertyName;
-    if (db.properties[propertyName]) {
-      sort = {
-        propertyId: db.properties[propertyName].id,
-        direction: siteConfig.defaultDbSort.direction,
-      };
-    }
+  let sort: SortOption | undefined;
+  const propertyName = siteConfig.publishDatePropertyName;
+  if (db.properties[propertyName]) {
+    sort = {
+      propertyId: db.properties[propertyName].id,
+      direction: "descending",
+    };
   }
 
   if (sort) {
     // to make the typechecker believe us that this will stay defined
     const definedSort = sort;
 
-    pages = _.sortBy(pages, (page) => {
-      const publisehdDateProp = _.find(
-        _.values(page.properties),
-        (prop): prop is DatePageProperty => prop.id == definedSort.propertyId,
-      );
-      return (
-        (definedSort.direction == "ascending" ? 1 : -1) *
-        new Date(publisehdDateProp?.date?.start || 0).getTime()
-      );
-    });
+    pages = _.chain(pages)
+      .map((page) => {
+        const publisehdDateProp = _.find(
+          _.values(page.properties),
+          (prop): prop is DatePageProperty => prop.id == definedSort.propertyId,
+        );
+        const date = publisehdDateProp?.date?.start;
+
+        return {
+          page,
+          date,
+        };
+      })
+      .filter(({ date }) => {
+        return !!date;
+      })
+      .sortBy(({ date }) => {
+        return (
+          (definedSort.direction == "ascending" ? 1 : -1) *
+          new Date(date!).getTime()
+        );
+      })
+      .map(({ page }) => page)
+      .value();
   }
 
   let tags = getDbTags(db)?.multi_select.options;

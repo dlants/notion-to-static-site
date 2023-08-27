@@ -21,24 +21,16 @@ export type SiteConfig = {
    */
   buttondownId?: string;
 
-  /** For every db, use the property with this name to sort.
-   *
-   * Note, currently only supports columns of the "date" type.
+  /** Each table should have a property with this name, that contains the date this page was published.
    */
-  defaultDbSort: {
-    propertyName: string;
-    direction: "ascending" | "descending";
-  };
+  publishDatePropertyName: string;
 };
 
 export const siteConfig: SiteConfig = {
   rootPageId: "ef63da75f05145d49829963c2d1f929f",
   headerPageIds: ["b193d2d6f9e94a2bb63e33ef69b18464"],
   homeName: "dlants.me",
-  buttondownId: 'dlants',
+  buttondownId: "dlants",
   faviconPath: "static/black-rectangle.svg",
-  defaultDbSort: {
-    propertyName: "Publish Date",
-    direction: "descending",
-  },
+  publishDatePropertyName: "Publish Date",
 };
