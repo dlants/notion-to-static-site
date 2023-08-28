@@ -5,6 +5,7 @@ import * as csstips from "csstips";
 import * as csx from "csx";
 import { renderToString } from "react-dom/server";
 import { MAX_WIDTH_PX } from "./constants";
+import { siteConfig } from "../config";
 
 const css = stylesheet({
   page: {
@@ -128,6 +129,7 @@ export function pageTemplate(pageContent: string) {
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono" rel="stylesheet">
 </head>
 <body>
+  ${`<a rel="me" style="display: none" href="${siteConfig.mastodonHref}">Mastodon</a>`}
   <div id="root">
     ${pageContent}
   </div>

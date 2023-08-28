@@ -24,6 +24,10 @@ export type SiteConfig = {
   /** Each table should have a property with this name, that contains the date this page was published.
    */
   publishDatePropertyName: string;
+
+  /** For verifying your mastodon identity.
+   */
+  mastodonHref: string
 };
 
 export const siteConfig: SiteConfig = {
@@ -31,6 +35,7 @@ export const siteConfig: SiteConfig = {
   headerPageIds: ["b193d2d6f9e94a2bb63e33ef69b18464"],
   homeName: "dlants.me",
   buttondownId: "dlants",
+  mastodonHref: "https://hachyderm.io/@dlants",
   faviconPath: "static/black-rectangle.svg",
   publishDatePropertyName: "Publish Date",
 };
