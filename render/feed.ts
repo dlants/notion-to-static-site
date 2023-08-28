@@ -1,6 +1,7 @@
 import { Feed } from "feed";
 import {
   DatabaseId,
+  DatePageProperty,
   RenderContext,
   getFilePath,
   getPageTitleProperty,
@@ -10,6 +11,7 @@ import { renderRichTextToPlainText } from "./rich-text";
 import fs from "fs";
 import path from "path";
 import { DbRenderOptions, getPagesForDb } from "./database";
+import { siteConfig } from "../config";
 
 export function renderDbFeed(
   databaseId: DatabaseId,
@@ -43,6 +45,13 @@ export function renderDbFeed(
 
   const { pages } = getPagesForDb(databaseId, options, context);
 
+  const db = context.dbs[databaseId];
+  const propertyName = siteConfig.publishDatePropertyName;
+  const propertyId = db.properties[propertyName].id;
+  if (!propertyId) {
+    throw new Error(`Expedted db to have property ${propertyName}`);
+  }
+
   for (const page of pages) {
     if (page.id == "index") {
       continue;
@@ -53,21 +62,29 @@ export function renderDbFeed(
       ? renderRichTextToPlainText(pageTitleProperty.title)
       : "[Untitled]";
 
-    feed.addItem({
-      title: pageTitle,
-      id: page.id,
-      link: `https://dlants.me/${page.id}.html`,
-      description: "Read the full post at dlants.me",
-      content: "Read the full post at dlants.me",
-      author: [
-        {
-          name: "Denis Lantsman",
-          email: "mail@mail.dlants.me",
-          link: "https://dlants.me",
-        },
-      ],
-      date: new Date(page.created_time),
-    });
+    const publisehdDateProp = _.find(
+      _.values(page.properties),
+      (prop): prop is DatePageProperty => prop.id == propertyId,
+    );
+    const date = publisehdDateProp?.date?.start;
+
+    if (date) {
+      feed.addItem({
+        title: pageTitle,
+        id: page.id,
+        link: `https://dlants.me/${page.id}.html`,
+        description: "Read the full post at dlants.me",
+        content: "Read the full post at dlants.me",
+        author: [
+          {
+            name: "Denis Lantsman",
+            email: "mail@mail.dlants.me",
+            link: "https://dlants.me",
+          },
+        ],
+        date: new Date(date),
+      });
+    }
   }
 
   fs.writeFileSync(
