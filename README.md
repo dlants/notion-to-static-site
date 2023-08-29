@@ -3,6 +3,8 @@ A hackable site generator for your notion pages.
 
 # Setup
 
+Fork this repo.
+
 Set up an internal Notion integration using [this guide](https://developers.notion.com/docs/authorization#internal-integration-auth-flow-set-up).
 
 Grant the integration access to the Notion page you want to use as the home page following [this guide](https://developers.notion.com/docs/authorization#integration-permissions).
