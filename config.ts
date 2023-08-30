@@ -35,7 +35,7 @@ export const siteConfig: SiteConfig = {
   headerPageIds: ["b193d2d6f9e94a2bb63e33ef69b18464"],
   homeName: "dlants.me",
   buttondownId: "dlants",
-  mastodonHref: "https://hachyderm.io/@dlants",
+  mastodonHref: "https://mastodon.dlants.me/@dlants",
   faviconPath: "static/black-rectangle.svg",
   publishDatePropertyName: "Publish Date",
 };
