@@ -1,5 +1,5 @@
 # notion-to-static-site
-A hackable site generator for your notion pages.
+Convert a notion page to a static site.
 
 # Setup
 
