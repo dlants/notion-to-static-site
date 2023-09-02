@@ -28,6 +28,13 @@ export type SiteConfig = {
   /** For verifying your mastodon identity.
    */
   mastodonHref: string
+
+  /** for a goatCounter analytics
+   */
+  goatCounter?: {
+    scriptData: string,
+    scriptSrc: string
+  }
 };
 
 export const siteConfig: SiteConfig = {
@@ -38,4 +45,8 @@ export const siteConfig: SiteConfig = {
   mastodonHref: "https://mastodon.dlants.me/@dlants",
   faviconPath: "static/black-rectangle.svg",
   publishDatePropertyName: "Publish Date",
+  goatCounter: {
+    scriptData: "https://goatcounter-e1un.onrender.com/count",
+    scriptSrc: "//goatcounter-e1un.onrender.com/count.js"
+  }
 };

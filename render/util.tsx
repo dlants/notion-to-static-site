@@ -127,6 +127,12 @@ export function pageTemplate(pageContent: string) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono" rel="stylesheet">
+  ${
+    siteConfig.goatCounter
+      ? `<script data-goatcounter="${siteConfig.goatCounter.scriptData}"
+    async src="${siteConfig.goatCounter.scriptSrc}"></script>`
+      : ""
+  }
 </head>
 <body>
   ${`<a rel="me" style="display: none" href="${siteConfig.mastodonHref}">Mastodon</a>`}
