@@ -85,7 +85,7 @@ export async function renderButtondown(context: RenderContext) {
     </div>,
   );
 
-  const html = pageTemplate(pageContent);
+  const html = pageTemplate(pageContent, { title: "newsletter" });
 
   fs.writeFileSync(path.join("dist", "buttondown.html"), html);
 }

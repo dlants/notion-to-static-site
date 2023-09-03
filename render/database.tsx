@@ -15,7 +15,11 @@ import {
 import { pageLayout } from "./util";
 import { renderHeader } from "./header";
 import * as React from "react";
-import { pageLink, renderRichTextContents } from "./rich-text";
+import {
+  pageLink,
+  renderRichTextContents,
+  renderRichTextToPlainText,
+} from "./rich-text";
 import * as csstips from "csstips";
 import * as csx from "csx";
 import fs from "fs";
@@ -187,7 +191,13 @@ export function renderDbPages(databaseId: DatabaseId, context: RenderContext) {
 
   const header = renderHeader(db, context);
   const content = [renderDbBlock(databaseId, {}, context)];
-  const html = pageLayout({ header, content });
+  const html = pageLayout({
+    header,
+    content,
+    meta: {
+      title: renderRichTextToPlainText(db.title),
+    },
+  });
   fs.writeFileSync(
     path.join(
       "dist",
@@ -206,7 +216,9 @@ export function renderDbPages(databaseId: DatabaseId, context: RenderContext) {
     const content = [
       renderDbBlock(databaseId, { filterTagId: tag.id }, context),
     ];
-    const html = pageLayout({ header, content });
+    const html = pageLayout({ header, content, meta: {
+      title: renderRichTextToPlainText(db.title) + ': ' + tag.name
+    } });
     const outPath = path.join(
       "dist",
       getFilePath({

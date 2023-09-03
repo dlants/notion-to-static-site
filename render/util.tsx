@@ -87,12 +87,18 @@ cssRule("html", {
   },
 });
 
+export type PageMetadata = {
+  title?: string;
+};
+
 export function pageLayout({
   header,
   content,
+  meta,
 }: {
   header: JSX.Element;
   content: (string | JSX.Element | undefined)[];
+  meta: PageMetadata;
 }) {
   const pageContent = renderToString(
     <div className={css.page}>
@@ -109,14 +115,15 @@ export function pageLayout({
     </div>,
   );
 
-  return pageTemplate(pageContent);
+  return pageTemplate(pageContent, meta);
 }
 
-export function pageTemplate(pageContent: string) {
+export function pageTemplate(pageContent: string, meta?: PageMetadata) {
   return `\
 <!DOCTYPE html>
 <html>
 <head>
+  ${meta?.title ? `<title>${meta.title}</title>` : ""}
   <style>${getStyles()}</style>
   <style>
     html { font-family: 'Roboto', sans-serif; }
