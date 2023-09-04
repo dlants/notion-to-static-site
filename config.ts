@@ -5,6 +5,10 @@ export type SiteConfig = {
    */
   rootPageId: string;
 
+  /** the feed for this db should become the '/rss' path
+   */
+  rootDatabaseId: string;
+
   /** This string will appear in the header next to the favicon, and in the breadcrumbs.
    */
   homeName: string;
@@ -39,6 +43,7 @@ export type SiteConfig = {
 
 export const siteConfig: SiteConfig = {
   rootPageId: "ef63da75f05145d49829963c2d1f929f",
+  rootDatabaseId: "f5032b5fd3894522bd351a0826faa56f",
   headerPageIds: ["b193d2d6f9e94a2bb63e33ef69b18464"],
   homeName: "dlants.me",
   buttondownId: "dlants",

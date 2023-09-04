@@ -4,6 +4,7 @@ import {
   PageObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import _ from "lodash";
+import { siteConfig } from "./config";
 
 export type BlockWithChildren = BlockObjectResponse & {
   children?: BlockWithChildren[];
@@ -244,17 +245,19 @@ export type FileLocation =
       feedType?: "rss" | "atom";
     };
 
-export function getPageTitleProperty(page: PageWithChildren): TitlePageProperty | undefined {
+export function getPageTitleProperty(
+  page: PageWithChildren,
+): TitlePageProperty | undefined {
   const title = _.find(
     _.values(page.properties),
     (p): p is TitlePageProperty => p.type == "title",
   );
 
   if (title) {
-    return title
+    return title;
   }
 
-  return page.properties['title'] as TitlePageProperty;
+  return page.properties["title"] as TitlePageProperty;
 }
 
 export function getFilePath(loc: FileLocation): string {
@@ -262,9 +265,23 @@ export function getFilePath(loc: FileLocation): string {
     case "page":
       return loc.pageId + ".html";
     case "db":
-      return `${loc.databaseId}${loc.tagFilter ? `/${loc.tagFilter}` : ""}${
-        loc.feedType ? "." + loc.feedType + ".xml" : ".html"
-      }`;
+      if (loc.feedType) {
+        const dbPath =
+          loc.databaseId == normalizePageId(siteConfig.rootDatabaseId)
+            ? ""
+            : loc.databaseId;
+
+        return (
+          dbPath +
+          (dbPath ? "/" : "") +
+          loc.tagFilter +
+          (dbPath || loc.tagFilter ? "/" : "") +
+          loc.feedType
+        );
+      } else {
+        const tag = loc.tagFilter ? `/${loc.tagFilter}` : "";
+        return loc.databaseId + tag + ".html";
+      }
 
     default:
       return assertUnreachable(loc);

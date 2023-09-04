@@ -108,7 +108,7 @@ export function renderDbBlock(
               type: "db",
               databaseId,
               tagFilter: options.filterTagId,
-              feedType: "rss",
+              feedType: "atom",
             })
           }
         >
@@ -198,16 +198,15 @@ export function renderDbPages(databaseId: DatabaseId, context: RenderContext) {
       title: renderRichTextToPlainText(db.title),
     },
   });
-  fs.writeFileSync(
-    path.join(
-      "dist",
-      getFilePath({
-        type: "db",
-        databaseId,
-      }),
-    ),
-    html,
+  const filePath = path.join(
+    "dist",
+    getFilePath({
+      type: "db",
+      databaseId,
+    }),
   );
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, html);
   renderDbFeed(databaseId, {}, context);
 
   // render a page for each tag
@@ -216,9 +215,13 @@ export function renderDbPages(databaseId: DatabaseId, context: RenderContext) {
     const content = [
       renderDbBlock(databaseId, { filterTagId: tag.id }, context),
     ];
-    const html = pageLayout({ header, content, meta: {
-      title: renderRichTextToPlainText(db.title) + ': ' + tag.name
-    } });
+    const html = pageLayout({
+      header,
+      content,
+      meta: {
+        title: renderRichTextToPlainText(db.title) + ": " + tag.name,
+      },
+    });
     const outPath = path.join(
       "dist",
       getFilePath({

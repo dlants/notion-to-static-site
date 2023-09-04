@@ -87,28 +87,27 @@ export function renderDbFeed(
     }
   }
 
-  fs.writeFileSync(
-    path.join(
-      "dist",
-      getFilePath({
-        type: "db",
-        databaseId,
-        tagFilter: options.filterTagId,
-        feedType: "rss",
-      }),
-    ),
-    feed.rss2(),
+  const rssPath = path.join(
+    "dist",
+    getFilePath({
+      type: "db",
+      databaseId,
+      tagFilter: options.filterTagId,
+      feedType: "rss",
+    }),
   );
-  fs.writeFileSync(
-    path.join(
-      "dist",
-      getFilePath({
-        type: "db",
-        databaseId,
-        tagFilter: options.filterTagId,
-        feedType: "atom",
-      }),
-    ),
-    feed.rss2(),
+  fs.mkdirSync(path.dirname(rssPath), { recursive: true });
+  fs.writeFileSync(rssPath, feed.rss2());
+
+  const atomPath = path.join(
+    "dist",
+    getFilePath({
+      type: "db",
+      databaseId,
+      tagFilter: options.filterTagId,
+      feedType: "atom",
+    }),
   );
+  fs.mkdirSync(path.dirname(atomPath), { recursive: true });
+  fs.writeFileSync(atomPath, feed.atom1());
 }
