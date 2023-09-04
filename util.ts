@@ -20,7 +20,10 @@ export type DatabaseWithChildren = DatabaseObjectResponse & {
 
 export type BlockId = string;
 export type PageId = string;
-export type TagId = string;
+
+/** One of the human-readable tag ids defined in the site config.
+ */
+export type TagSiteConfigId = string & { __siteConfigTagName: true };
 export type DatabaseId = string;
 export type PropertyId = string;
 
@@ -227,6 +230,7 @@ export type MultiSelectDbProperty = SelectProperty<
 >;
 
 export type Tags = MultiSelectDbProperty["multi_select"]["options"];
+export type Tag = Tags[number];
 
 export type DatePageProperty = SelectProperty<
   PageObjectResponse["properties"]["key"],
@@ -241,8 +245,12 @@ export type FileLocation =
   | {
       type: "db";
       databaseId: DatabaseId;
-      tagFilter?: TagId;
+      tag?: TagSiteConfigId;
       feedType?: "rss" | "atom";
+    }
+  | {
+      type: "newsletter";
+      tag?: TagSiteConfigId;
     };
 
 export function getPageTitleProperty(
@@ -274,13 +282,19 @@ export function getFilePath(loc: FileLocation): string {
         return (
           dbPath +
           (dbPath ? "/" : "") +
-          loc.tagFilter +
-          (dbPath || loc.tagFilter ? "/" : "") +
+          loc.tag +
+          (dbPath || loc.tag ? "/" : "") +
           loc.feedType
         );
       } else {
-        const tag = loc.tagFilter ? `/${loc.tagFilter}` : "";
-        return loc.databaseId + tag + ".html";
+        return loc.databaseId + (loc.tag ? "/" + loc.tag : "") + ".html";
+      }
+
+    case "newsletter":
+      if (loc.tag) {
+        return loc.tag + "/buttondown.html";
+      } else {
+        return "buttondown.html";
       }
 
     default:

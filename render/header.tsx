@@ -5,6 +5,7 @@ import {
   assertUnreachable,
   DatabaseWithChildren,
   normalizePageId,
+  getFilePath,
 } from "../util";
 import * as React from "react";
 import { stylesheet, classes, media, extend } from "typestyle";
@@ -103,7 +104,7 @@ export function renderHeader(
         {siteConfig.buttondownId ? (
           <div className={classes(css.headerItem, css.subscribe)}>
             {"| "}
-            <a href="/buttondown.html">newsletter</a>
+            <a href={"/" + getFilePath({ type: "newsletter" })}>newsletter</a>
           </div>
         ) : (
           ""

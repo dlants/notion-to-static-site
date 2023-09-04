@@ -1,6 +1,12 @@
 import { renderToString } from "react-dom/server";
 import * as React from "react";
-import { RenderContext } from "../util";
+import {
+  RenderContext,
+  Tag,
+  TagSiteConfigId,
+  getFilePath,
+  normalizePageId,
+} from "../util";
 import { stylesheet, media, extend } from "typestyle";
 import * as csstips from "csstips";
 import * as csx from "csx";
@@ -10,6 +16,7 @@ import { pageTemplate } from "./util";
 import fs from "fs";
 import path from "path";
 import { siteConfig } from "../config";
+import { getDbTags } from "./database";
 
 const css = stylesheet({
   page: {
@@ -46,7 +53,24 @@ const css = stylesheet({
   },
 });
 
-export async function renderButtondown(context: RenderContext) {
+export function renderButtondown(context: RenderContext) {
+  const db = context.dbs[normalizePageId(siteConfig.rootDatabaseId)];
+
+  // buttondown to sign up for everything
+  renderButtondownPage(undefined, context);
+  const tags = getDbTags(db);
+  for (const tag of tags?.multi_select.options || []) {
+    const tagSiteConfigId = siteConfig.tagMap[tag.id];
+    if (tagSiteConfigId) {
+      renderButtondownPage({ ...tag, tagSiteConfigId }, context);
+    }
+  }
+}
+
+function renderButtondownPage(
+  tag: (Tag & { tagSiteConfigId: TagSiteConfigId }) | undefined,
+  context: RenderContext,
+) {
   const pageContent = renderToString(
     <div className={css.page}>
       {renderHeader(undefined, context)}
@@ -54,25 +78,38 @@ export async function renderButtondown(context: RenderContext) {
         <div className={css.contentPadding} />
 
         <div className={css.content}>
-          <h1>Sign up for my newsletter</h1>
-          <p>Get emails when I write new posts.</p>
+          <h1>
+            Get emails when I write{" "}
+            {tag ? `new posts tagged with "${tag.name}".` : `any new posts.`}
+          </h1>
           <div
             dangerouslySetInnerHTML={{
               __html: `\
 <form
-  action="https://buttondown.email/api/emails/embed-subscribe/${siteConfig.buttondownId}"
+  action="https://buttondown.email/api/emails/embed-subscribe/${
+    siteConfig.buttondownId
+  }"
   method="post"
   target="popupwindow"
-  onsubmit="window.open('https://buttondown.email/${siteConfig.buttondownId}', 'popupwindow')"
+  onsubmit="window.open('https://buttondown.email/${
+    siteConfig.buttondownId
+  }', 'popupwindow')"
   class="embeddable-buttondown-form"
 >
 
   <label for="bd-email">Enter your email</label>
   <input type="email" name="email" id="bd-email" />
+  ${
+    tag
+      ? `<input type="hidden" name="tag" value="${tag.tagSiteConfigId}" />`
+      : ""
+  }
 
   <input type="submit" value="Subscribe" />
   <p>
-    <a href="https://buttondown.email/refer/${siteConfig.buttondownId}" target="_blank"
+    <a href="https://buttondown.email/refer/${
+      siteConfig.buttondownId
+    }" target="_blank"
       >Powered by Buttondown.</a
     >
   </p>
@@ -86,6 +123,10 @@ export async function renderButtondown(context: RenderContext) {
   );
 
   const html = pageTemplate(pageContent, { title: "newsletter" });
+  const outputFile = path.join(
+    "dist",
+    getFilePath({ type: "newsletter", tag: tag?.tagSiteConfigId }),
+  );
 
-  fs.writeFileSync(path.join("dist", "buttondown.html"), html);
+  fs.writeFileSync(outputFile, html);
 }

@@ -92,7 +92,7 @@ export function renderDbFeed(
     getFilePath({
       type: "db",
       databaseId,
-      tagFilter: options.filterTagId,
+      tag: options.tagFilter?.tagSiteConfigId,
       feedType: "rss",
     }),
   );
@@ -104,7 +104,7 @@ export function renderDbFeed(
     getFilePath({
       type: "db",
       databaseId,
-      tagFilter: options.filterTagId,
+      tag: options.tagFilter?.tagSiteConfigId,
       feedType: "atom",
     }),
   );

@@ -9,7 +9,7 @@ import {
   MultiSelectDbProperty,
   Tags,
   PropertyId,
-  TagId,
+  TagSiteConfigId,
   DatePageProperty,
 } from "../util";
 import { pageLayout } from "./util";
@@ -65,7 +65,10 @@ const css = stylesheet({
 });
 
 export type DbRenderOptions = {
-  filterTagId?: TagId;
+  tagFilter?: {
+    id: string;
+    tagSiteConfigId: TagSiteConfigId;
+  };
 };
 
 export type SortOption = {
@@ -93,7 +96,7 @@ export function renderDbBlock(
             getFilePath({
               type: "db",
               databaseId,
-              tagFilter: options.filterTagId,
+              tag: options.tagFilter?.tagSiteConfigId,
               feedType: "rss",
             })
           }
@@ -107,13 +110,30 @@ export function renderDbBlock(
             getFilePath({
               type: "db",
               databaseId,
-              tagFilter: options.filterTagId,
+              tag: options.tagFilter?.tagSiteConfigId,
               feedType: "atom",
             })
           }
         >
           atom
         </a>
+        {siteConfig.buttondownId && options.tagFilter ? (
+          <div className={css.feedLink}>
+            <a
+              href={
+                "/" +
+                getFilePath({
+                  type: "newsletter",
+                  tag: options.tagFilter.tagSiteConfigId,
+                })
+              }
+            >
+              newsletter
+            </a>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
       <div className={css.dbRowContainer}>
         {pages.map((p) => renderPageRow(databaseId, p, context))}
@@ -129,13 +149,11 @@ export function getPagesForDb(
 ) {
   const db = context.dbs[databaseId];
   let pages = db.children.map((pageId) => context.pages[pageId]);
-  if (options.filterTagId) {
+  if (options.tagFilter) {
+    const targetId = options.tagFilter.id;
     pages = pages.filter((page) => {
       const pageTags = getTags(page);
-      return _.some(
-        pageTags?.multi_select,
-        (tag) => tag.id == options.filterTagId,
-      );
+      return _.some(pageTags?.multi_select, (tag) => tag.id == targetId);
     });
   }
 
@@ -179,8 +197,9 @@ export function getPagesForDb(
   }
 
   let tags = getDbTags(db)?.multi_select.options;
-  if (options.filterTagId) {
-    tags = tags?.filter((t) => t.id == options.filterTagId);
+  if (options.tagFilter) {
+    const targetId = options.tagFilter.id;
+    tags = tags?.filter((t) => t.id == targetId);
   }
 
   return { pages, tags };
@@ -212,8 +231,17 @@ export function renderDbPages(databaseId: DatabaseId, context: RenderContext) {
   // render a page for each tag
   const tags = getDbTags(db)?.multi_select.options;
   for (const tag of tags || []) {
+    const tagSiteConfigId = siteConfig.tagMap[tag.id];
+    if (!tagSiteConfigId) {
+      continue;
+    }
+
     const content = [
-      renderDbBlock(databaseId, { filterTagId: tag.id }, context),
+      renderDbBlock(
+        databaseId,
+        { tagFilter: { id: tag.id, tagSiteConfigId } },
+        context,
+      ),
     ];
     const html = pageLayout({
       header,
@@ -227,7 +255,7 @@ export function renderDbPages(databaseId: DatabaseId, context: RenderContext) {
       getFilePath({
         type: "db",
         databaseId,
-        tagFilter: tag.id,
+        tag: tagSiteConfigId,
       }),
     );
 
@@ -236,11 +264,15 @@ export function renderDbPages(databaseId: DatabaseId, context: RenderContext) {
     });
     fs.writeFileSync(outPath, html);
 
-    renderDbFeed(databaseId, { filterTagId: tag.id }, context);
+    renderDbFeed(
+      databaseId,
+      { tagFilter: { id: tag.id, tagSiteConfigId } },
+      context,
+    );
   }
 }
 
-function getDbTags(db: DatabaseWithChildren) {
+export function getDbTags(db: DatabaseWithChildren) {
   return _.find(
     _.values(db.properties),
     (p): p is MultiSelectDbProperty => p.type == "multi_select",
@@ -269,15 +301,24 @@ function renderPageRow(
 }
 
 function renderTags(databaseId: DatabaseId, tags: Tags) {
-  return tags.map((tag) => (
-    <a
-      className={css.tag}
-      style={{
-        background: NOTION_BACKGROUND_COLORS[tag.color].toString(),
-      }}
-      href={"/" + getFilePath({ type: "db", databaseId, tagFilter: tag.id })}
-    >
-      {tag.name}
-    </a>
-  ));
+  return tags.map((tag) => {
+    const tagSiteConfigId = siteConfig.tagMap[tag.id];
+    if (!tagSiteConfigId) {
+      return <span />;
+    }
+
+    return (
+      <a
+        className={css.tag}
+        style={{
+          background: NOTION_BACKGROUND_COLORS[tag.color].toString(),
+        }}
+        href={
+          "/" + getFilePath({ type: "db", databaseId, tag: tagSiteConfigId })
+        }
+      >
+        {tag.name}
+      </a>
+    );
+  });
 }
