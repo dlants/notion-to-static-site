@@ -90,8 +90,7 @@ export function renderDbFeed(
   const rssPath = path.join(
     "dist",
     getFilePath({
-      type: "db",
-      databaseId,
+      type: "feed",
       tag: options.tagFilter?.tagSiteConfigId,
       feedType: "rss",
     }),
@@ -102,8 +101,7 @@ export function renderDbFeed(
   const atomPath = path.join(
     "dist",
     getFilePath({
-      type: "db",
-      databaseId,
+      type: "feed",
       tag: options.tagFilter?.tagSiteConfigId,
       feedType: "atom",
     }),

@@ -59,9 +59,8 @@ export const siteConfig: SiteConfig = {
   tagMap: {
     [normalizePageId("68bbc05889b344d483fe94678908f548")]: "education" as TagSiteConfigId,
     [normalizePageId("6539b1d14c39458fa93a95a7786b11a3")]: "tech" as TagSiteConfigId,
-    [normalizePageId("624670f6243a46d987b73ee2fd6d7777")]: "fun" as TagSiteConfigId,
-    [normalizePageId("283a809d84234861a5578f5cb4d89b80")]: "training" as TagSiteConfigId,
     [normalizePageId("198d8d7b1d48414e976b9aa162bdeb34")]: "climbing" as TagSiteConfigId,
+    [normalizePageId("624670f6243a46d987b73ee2fd6d7777")]: "etc" as TagSiteConfigId,
   },
   headerPageIds: [normalizePageId("b193d2d6f9e94a2bb63e33ef69b18464")],
   homeName: "dlants.me",

@@ -8,8 +8,9 @@ import { NotionClientWrapper } from "./fetch-page";
 import { loadPages } from "./load-page";
 import { renderPage } from "./render/page";
 import { renderButtondown } from "./render/buttondown";
-import { renderDbPages } from "./render/database";
+import { renderDbPage } from "./render/database";
 import { siteConfig } from "./config";
+import { renderTagPage } from "./render/tag-page";
 dotenv.config();
 
 yargs
@@ -66,13 +67,19 @@ yargs
 
       for (const pageId in context.pages) {
         const page = context.pages[pageId];
-        console.log(`processing ${page.id}`);
+        console.log(`rendering ${page.id}`);
         renderPage(page, context);
       }
 
       for (const databaseId in context.dbs) {
-        console.log(`processing ${databaseId}`);
-        renderDbPages(databaseId, context);
+        console.log(`rendering ${databaseId}`);
+        renderDbPage(databaseId, context);
+      }
+
+      for (const tagId in siteConfig.tagMap) {
+        const tagSiteConfigId = siteConfig.tagMap[tagId];
+        console.log(`rendering ${tagSiteConfigId}`);
+        renderTagPage(tagId, tagSiteConfigId, context);
       }
 
       if (siteConfig.buttondownId) {

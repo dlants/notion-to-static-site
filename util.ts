@@ -4,7 +4,6 @@ import {
   PageObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import _ from "lodash";
-import { siteConfig } from "./config";
 
 export type BlockWithChildren = BlockObjectResponse & {
   children?: BlockWithChildren[];
@@ -20,6 +19,7 @@ export type DatabaseWithChildren = DatabaseObjectResponse & {
 
 export type BlockId = string;
 export type PageId = string;
+export type TagId = string;
 
 /** One of the human-readable tag ids defined in the site config.
  */
@@ -245,8 +245,15 @@ export type FileLocation =
   | {
       type: "db";
       databaseId: DatabaseId;
+    }
+  | {
+      type: "tag";
+      tag: TagSiteConfigId;
+    }
+  | {
+      type: "feed";
+      feedType: "rss" | "atom";
       tag?: TagSiteConfigId;
-      feedType?: "rss" | "atom";
     }
   | {
       type: "newsletter";
@@ -272,23 +279,19 @@ export function getFilePath(loc: FileLocation): string {
   switch (loc.type) {
     case "page":
       return loc.pageId + ".html";
-    case "db":
-      if (loc.feedType) {
-        const dbPath =
-          loc.databaseId == normalizePageId(siteConfig.rootDatabaseId)
-            ? ""
-            : loc.databaseId;
 
-        return (
-          dbPath +
-          (dbPath ? "/" : "") +
-          loc.tag +
-          (dbPath || loc.tag ? "/" : "") +
-          loc.feedType
-        );
+    case "db":
+      return loc.databaseId + ".html";
+
+    case "feed":
+      if (loc.tag) {
+        return loc.tag + "/" + loc.feedType;
       } else {
-        return loc.databaseId + (loc.tag ? "/" + loc.tag : "") + ".html";
+        return loc.feedType;
       }
+
+    case "tag":
+      return loc.tag + '.html'
 
     case "newsletter":
       if (loc.tag) {

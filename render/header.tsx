@@ -15,6 +15,7 @@ import { favicon } from "./favicon";
 import { COLORS } from "./constants";
 import { databaseLink, pageLink } from "./rich-text";
 import { siteConfig } from "../config";
+import _ from 'lodash'
 
 const css = stylesheet({
   header: {
@@ -95,6 +96,14 @@ export function renderHeader(
           <span>{siteConfig.homeName}</span>
         </a>
         <div className={css.divider} />
+        {_.keys(siteConfig.tagMap).map((tagId) => {
+          const tagSiteConfigId = siteConfig.tagMap[tagId];
+          return <div className={classes(css.headerItem, css.section)}>
+            <a href={"/" + getFilePath({ type: "tag", tag: tagSiteConfigId })}>
+              {tagSiteConfigId}
+            </a>
+          </div>;
+        })}
         {sectionPages.map((pageId) => (
           <div className={classes(css.headerItem, css.section)}>
             {pageLink(context.pages[pageId], context)}
