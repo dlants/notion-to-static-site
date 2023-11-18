@@ -319,5 +319,5 @@ export function getPublishDatePropertyId({
   if (!propertyId) {
     throw new Error(`Expedted db to have property ${propertyName}`);
   }
-  return propertyId
+  return propertyId;
 }

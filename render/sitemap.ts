@@ -7,13 +7,12 @@ import {
   DatePageProperty,
 } from "../util";
 import _ from "lodash";
-import { DbRenderOptions, getPagesForDb } from "./database";
+import { DbRenderOptions } from "./database";
 import fs from "fs";
 import path from "path";
 
 export async function renderSitemap({
   databaseId,
-  options,
   context,
 }: {
   databaseId: DatabaseId;
@@ -21,22 +20,23 @@ export async function renderSitemap({
   context: RenderContext;
 }) {
   const links = [];
-  const { pages } = getPagesForDb(databaseId, options, context);
   const publishDatePropertyId = getPublishDatePropertyId({
     databaseId,
     context,
   });
 
-  for (const page of pages) {
+  for (const pageId in context.pages) {
+    const page = context.pages[pageId];
     const publisehdDateProp = _.find(
       _.values(page.properties),
       (prop): prop is DatePageProperty => prop.id == publishDatePropertyId,
     );
     const date = publisehdDateProp?.date?.start;
 
-    if (date) {
+    // some pages are not part of the main db, and so do not have a publishedDateProp
+    if (!publisehdDateProp || date) {
       links.push({
-        url: `/${page.id}.html`
+        url: `/${page.id}.html`,
       });
     }
   }
