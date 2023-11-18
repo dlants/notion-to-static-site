@@ -11,6 +11,7 @@ import { renderButtondown } from "./render/buttondown";
 import { renderDbPage } from "./render/database";
 import { siteConfig } from "./config";
 import { renderTagPage } from "./render/tag-page";
+import { renderSitemap } from "./render/sitemap";
 dotenv.config();
 
 yargs
@@ -85,6 +86,12 @@ yargs
       if (siteConfig.buttondownId) {
         renderButtondown(context);
       }
+
+      await renderSitemap({
+        context,
+        options: {},
+        databaseId: siteConfig.rootDatabaseId,
+      });
     },
   )
   .help().argv;

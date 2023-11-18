@@ -4,6 +4,7 @@ import {
   PageObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import _ from "lodash";
+import { siteConfig } from "./config";
 
 export type BlockWithChildren = BlockObjectResponse & {
   children?: BlockWithChildren[];
@@ -291,7 +292,7 @@ export function getFilePath(loc: FileLocation): string {
       }
 
     case "tag":
-      return loc.tag + '.html'
+      return loc.tag + ".html";
 
     case "newsletter":
       if (loc.tag) {
@@ -303,4 +304,20 @@ export function getFilePath(loc: FileLocation): string {
     default:
       return assertUnreachable(loc);
   }
+}
+
+export function getPublishDatePropertyId({
+  databaseId,
+  context,
+}: {
+  databaseId: DatabaseId;
+  context: RenderContext;
+}) {
+  const db = context.dbs[databaseId];
+  const propertyName = siteConfig.publishDatePropertyName;
+  const propertyId = db.properties[propertyName].id;
+  if (!propertyId) {
+    throw new Error(`Expedted db to have property ${propertyName}`);
+  }
+  return propertyId
 }
