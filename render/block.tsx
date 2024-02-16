@@ -338,6 +338,13 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
             ) : (
               <a href={url}>{url}</a>
             )}
+            {block.video.caption ? (
+              <div className={css.caption}>
+                {renderRichText(block.video.caption, context)}
+              </div>
+            ) : (
+              void 0
+            )}
           </div>
         );
       }
