@@ -113,6 +113,8 @@ export function renderHeader(
         {siteConfig.buttondownId ? (
           <div className={classes(css.headerItem, css.subscribe)}>
             {"| "}
+            <a href={"/" + getFilePath({ type: "feed", feedType: "rss" })}>rss</a>{" "}
+            <a href={"/" + getFilePath({ type: "feed", feedType: "atom" })}>atom</a>{" "}
             <a href={"/" + getFilePath({ type: "newsletter" })}>newsletter</a>
           </div>
         ) : (

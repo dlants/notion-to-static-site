@@ -19,7 +19,7 @@ yargs
     "serve ",
     "serve the site locally",
     (yargs) => {
-      yargs.positional("port", {
+      yargs.option("port", {
         describe: "port to bind on",
         default: 1337,
       });
