@@ -3,6 +3,7 @@ import { renderRichText, renderRichTextContents, pageLink } from "./rich-text";
 import { BlockWithChildren, RenderContext, assertUnreachable } from "../util";
 import { stylesheet } from "typestyle";
 import { COLORS } from "./constants";
+import { URL } from "url";
 import * as csx from "csx";
 import * as csstips from "csstips";
 import { renderDbBlock } from "./database";
@@ -320,16 +321,21 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
     case "video":
       if (block.video.type == "external") {
         const url = block.video.external.url;
+        let ytVideoId: string | undefined = undefined;
+        if (url.startsWith("https://youtu.be")) {
+          ytVideoId = url.slice(url.lastIndexOf("/") + 1);
+        }
+        if (url.startsWith("https://www.youtube.com")) {
+          const parsedUrl = new URL(url);
+          ytVideoId = parsedUrl.searchParams.get('v') || undefined
+        }
         return (
           <div className={css.video}>
-            {url.startsWith("https://youtu.be") ? (
+            {ytVideoId ? (
               <iframe
                 width="560"
                 height="315"
-                src={
-                  "https://www.youtube.com/embed" +
-                  url.slice(url.lastIndexOf("/"))
-                }
+                src={"https://www.youtube.com/embed/" + ytVideoId}
                 title="YouTube video player"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen={true}
