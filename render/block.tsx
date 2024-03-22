@@ -1,7 +1,7 @@
 import * as React from "react";
 import { renderRichText, renderRichTextContents, pageLink } from "./rich-text";
 import { BlockWithChildren, RenderContext, assertUnreachable } from "../util";
-import { stylesheet } from "typestyle";
+import { stylesheet, media, extend } from "typestyle";
 import { COLORS } from "./constants";
 import { URL } from "url";
 import * as csx from "csx";
@@ -9,6 +9,17 @@ import * as csstips from "csstips";
 import { renderDbBlock } from "./database";
 
 const css = stylesheet({
+  columnList: {
+    ...extend(
+      csstips.horizontal,
+      media({ minWidth: 0, maxWidth: 600 }, csstips.vertical),
+    ),
+  },
+  column: {
+    ...csstips.vertical,
+    ...csstips.flex,
+    padding: csx.px(15),
+  },
   divider: {
     height: csx.em(1),
     ...csstips.horizontal,
@@ -25,10 +36,15 @@ const css = stylesheet({
   video: {
     ...csstips.vertical,
     alignItems: "center",
-    ...csstips.width("100%"),
+    position: "relative",
+    ...csstips.width(csx.percent(100)),
+    ...csstips.height(0),
+    minHeight: csx.px(100),
+    paddingBottom: csx.percent(56.25),
     $nest: {
       iframe: {
         ...csstips.content,
+        position: "absolute",
       },
     },
   },
@@ -275,13 +291,24 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
     case "callout":
     case "breadcrumb":
     case "table_of_contents":
-    case "column_list":
-    case "column":
     case "link_to_page":
     case "table":
     case "table_row":
     case "embed":
       return <div>{block.type} not implemented</div>;
+    case "column":
+      return (
+        <div className={css.column}>
+          {block.children ? renderBlocks(block.children, context) : undefined}
+        </div>
+      );
+
+    case "column_list":
+      return (
+        <div className={css.columnList}>
+          {block.children ? renderBlocks(block.children, context) : undefined}
+        </div>
+      );
     case "bookmark":
       return (
         <div className={css.bookmark}>
@@ -327,14 +354,14 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
         }
         if (url.startsWith("https://www.youtube.com")) {
           const parsedUrl = new URL(url);
-          ytVideoId = parsedUrl.searchParams.get('v') || undefined
+          ytVideoId = parsedUrl.searchParams.get("v") || undefined;
         }
         return (
           <div className={css.video}>
             {ytVideoId ? (
               <iframe
-                width="560"
-                height="315"
+                width="100%"
+                height="100%"
                 src={"https://www.youtube.com/embed/" + ytVideoId}
                 title="YouTube video player"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
