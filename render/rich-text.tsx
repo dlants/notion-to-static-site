@@ -7,6 +7,7 @@ import {
   DatabaseWithChildren,
   TitlePageProperty,
   getFilePath,
+  getPageShortUrl,
 } from "../util";
 import { stylesheet } from "typestyle";
 import { COLORS } from "./constants";
@@ -142,13 +143,19 @@ export function pageLink(page: PageWithChildren, context: RenderContext) {
   return (
     <a
       className={css.pageLink}
-      href={"/" + getFilePath({ type: "page", pageId: page.id })}
+      href={
+        "/" +
+        getFilePath({
+          type: "page",
+          shortUrl: getPageShortUrl(page),
+        })
+      }
     >
       {page.id == "index"
         ? siteConfig.homeName
         : title
-        ? renderRichTextContents(title.title, context)
-        : "[Untitled Page]"}
+          ? renderRichTextContents(title.title, context)
+          : "[Untitled Page]"}
     </a>
   );
 }

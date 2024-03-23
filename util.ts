@@ -5,6 +5,7 @@ import {
 } from "@notionhq/client/build/src/api-endpoints";
 import _ from "lodash";
 import { siteConfig } from "./config";
+import { renderRichTextToPlainText } from "./render/rich-text";
 
 export type BlockWithChildren = BlockObjectResponse & {
   children?: BlockWithChildren[];
@@ -20,6 +21,7 @@ export type DatabaseWithChildren = DatabaseObjectResponse & {
 
 export type BlockId = string;
 export type PageId = string;
+export type ShortUrl = string;
 export type TagId = string;
 
 /** One of the human-readable tag ids defined in the site config.
@@ -241,7 +243,7 @@ export type DatePageProperty = SelectProperty<
 export type FileLocation =
   | {
       type: "page";
-      pageId: PageId;
+      shortUrl: ShortUrl;
     }
   | {
       type: "db";
@@ -279,7 +281,7 @@ export function getPageTitleProperty(
 export function getFilePath(loc: FileLocation): string {
   switch (loc.type) {
     case "page":
-      return loc.pageId + ".html";
+      return loc.shortUrl + ".html";
 
     case "db":
       return loc.databaseId + ".html";
@@ -303,6 +305,35 @@ export function getFilePath(loc: FileLocation): string {
 
     default:
       return assertUnreachable(loc);
+  }
+}
+
+export function getPageShortUrl(page: PageWithChildren) {
+  if (page.id == "index") {
+    return page.id;
+  }
+
+  const shortUrlProperty = page.properties[siteConfig.shortUrlPropertyName];
+
+  if (shortUrlProperty && shortUrlProperty.type == "rich_text") {
+    return renderRichTextToPlainText(shortUrlProperty.rich_text);
+  }
+
+  const title = getPageTitle(page);
+  if (title) {
+    return title.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 10);
+  }
+
+  return page.id.toLowerCase().substring(0, 5);
+}
+
+export function getPageTitle(page: PageWithChildren) {
+  const titleProperty = _.find(
+    _.values(page.properties),
+    (p): p is TitlePageProperty => p.type == "title",
+  );
+  if (titleProperty && titleProperty.type == "title") {
+    return renderRichTextToPlainText(titleProperty.title);
   }
 }
 

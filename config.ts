@@ -41,6 +41,11 @@ export type SiteConfig = {
    */
   publishDatePropertyName: string;
 
+  /** Each table should have a property with this name, that contains the short url the page should be linked under.
+   * These should be unique and not collide with tags or other url paths.
+   */
+  shortUrlPropertyName: string;
+
   /** For verifying your mastodon identity.
    */
   mastodonHref: string;
@@ -68,6 +73,7 @@ export const siteConfig: SiteConfig = {
   mastodonHref: "https://mastodon.dlants.me/@dlants",
   faviconPath: "static/black-rectangle.svg",
   publishDatePropertyName: "Publish Date",
+  shortUrlPropertyName: "short-url",
   goatCounter: {
     scriptData: "https://goatcounter-e1un.onrender.com/count",
     scriptSrc: "//goatcounter-e1un.onrender.com/count.js",
