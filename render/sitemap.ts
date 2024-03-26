@@ -5,6 +5,8 @@ import {
   RenderContext,
   getPublishDatePropertyId,
   DatePageProperty,
+  getFilePath,
+  getPageShortUrl,
 } from "../util";
 import _ from "lodash";
 import { DbRenderOptions } from "./database";
@@ -32,11 +34,15 @@ export async function renderSitemap({
       (prop): prop is DatePageProperty => prop.id == publishDatePropertyId,
     );
     const date = publisehdDateProp?.date?.start;
+    const filePath = getFilePath({
+      type: "page",
+      shortUrl: getPageShortUrl(page),
+    })
 
     // some pages are not part of the main db, and so do not have a publishedDateProp
     if (!publisehdDateProp || date) {
       links.push({
-        url: `/${page.id}.html`,
+        url: filePath
       });
     }
   }
