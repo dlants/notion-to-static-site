@@ -55,7 +55,7 @@ const css = stylesheet({
   },
   code: {
     display: "inline-block",
-    whiteSpace: "nowrap",
+    whiteSpace: "pre",
     width: "100%",
     overflowX: "scroll",
     "-ms-overflow-style": "none", // hide scrollbar in IE and Edge

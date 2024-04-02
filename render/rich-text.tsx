@@ -62,7 +62,7 @@ function renderRichTextElement(
   let content;
   switch (item.type) {
     case "text":
-      content = item.plain_text;
+      content = item.text.content || item.plain_text;
       break;
     case "mention":
       if (item.mention.type == "page") {
