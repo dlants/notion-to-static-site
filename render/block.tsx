@@ -348,14 +348,15 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
     case "video":
       if (block.video.type == "external") {
         const url = block.video.external.url;
+        const parsedUrl = new URL(url);
         let ytVideoId: string | undefined = undefined;
-        if (url.startsWith("https://youtu.be")) {
-          ytVideoId = url.slice(url.lastIndexOf("/") + 1);
-        }
-        if (url.startsWith("https://www.youtube.com")) {
-          const parsedUrl = new URL(url);
+
+        if (url.startsWith("https://youtu.be") || parsedUrl.pathname.startsWith('/shorts')) {
+          ytVideoId = parsedUrl.pathname.slice(parsedUrl.pathname.lastIndexOf("/") + 1);
+        } else if (parsedUrl.searchParams.get("v")) {
           ytVideoId = parsedUrl.searchParams.get("v") || undefined;
         }
+
         return (
           <div className={css.video}>
             {ytVideoId ? (
