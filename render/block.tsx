@@ -36,10 +36,13 @@ const css = stylesheet({
   video: {
     ...csstips.vertical,
     alignItems: "center",
-    position: "relative",
+  },
+  embedContainer: {
+    ...csstips.content,
     ...csstips.width(csx.percent(100)),
     ...csstips.height(0),
     minHeight: csx.px(100),
+    position: "relative",
     paddingBottom: csx.percent(56.25),
     $nest: {
       iframe: {
@@ -103,6 +106,7 @@ const css = stylesheet({
   },
 
   caption: {
+    ...csstips.content,
     paddingTop: csx.px(6),
     paddingBottom: csx.px(6),
     color: COLORS.darkgray.toString(),
@@ -351,8 +355,13 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
         const parsedUrl = new URL(url);
         let ytVideoId: string | undefined = undefined;
 
-        if (url.startsWith("https://youtu.be") || parsedUrl.pathname.startsWith('/shorts')) {
-          ytVideoId = parsedUrl.pathname.slice(parsedUrl.pathname.lastIndexOf("/") + 1);
+        if (
+          url.startsWith("https://youtu.be") ||
+          parsedUrl.pathname.startsWith("/shorts")
+        ) {
+          ytVideoId = parsedUrl.pathname.slice(
+            parsedUrl.pathname.lastIndexOf("/") + 1,
+          );
         } else if (parsedUrl.searchParams.get("v")) {
           ytVideoId = parsedUrl.searchParams.get("v") || undefined;
         }
@@ -360,15 +369,17 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
         return (
           <div className={css.video}>
             {ytVideoId ? (
-              <iframe
-                width="100%"
-                height="100%"
-                src={"https://www.youtube.com/embed/" + ytVideoId}
-                title="YouTube video player"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen={true}
-                frameBorder="0"
-              ></iframe>
+              <div className={css.embedContainer}>
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={"https://www.youtube.com/embed/" + ytVideoId}
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen={true}
+                  frameBorder="0"
+                ></iframe>
+              </div>
             ) : (
               <a href={url}>{url}</a>
             )}
