@@ -1,5 +1,10 @@
 import * as React from "react";
-import { renderRichText, renderRichTextContents, pageLink } from "./rich-text";
+import {
+  renderRichText,
+  renderRichTextContents,
+  pageLink,
+  slugify,
+} from "./rich-text";
 import { BlockWithChildren, RenderContext, assertUnreachable } from "../util";
 import { stylesheet, media, extend } from "typestyle";
 import { COLORS } from "./constants";
@@ -32,6 +37,19 @@ const css = stylesheet({
         borderBottom: "1px solid " + COLORS.gray.toRGBA(),
       },
     },
+  },
+  heading: {
+    $nest: {
+      a: {
+        color: "inherit",
+        textDecoration: "none",
+        $nest: {
+          '&:hover': {
+            textDecoration: 'underline'
+          }
+        }
+      }
+    }
   },
   video: {
     ...csstips.vertical,
@@ -222,19 +240,41 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
       if (block.has_children) {
         console.warn(`block type ${block.type} with children not implemented`);
       }
-      return <h1>{renderRichText(block.heading_1.rich_text, context)}</h1>;
+      const slug = slugify(block.heading_1.rich_text);
+      return (
+        <h1 id={slug} className={css.heading}>
+          <a href={"#" + slug}>
+            {renderRichText(block.heading_1.rich_text, context)}
+          </a>
+        </h1>
+      );
+
     case "heading_2":
       if (block.has_children) {
         console.warn(`block type ${block.type} with children not implemented`);
       }
+      const slug2 = slugify(block.heading_2.rich_text);
+      return (
+        <h2 id={slug2} className={css.heading}>
+          <a href={"#" + slug2}>
+            {renderRichText(block.heading_2.rich_text, context)}
+          </a>
+        </h2>
+      );
 
-      return <h2>{renderRichText(block.heading_2.rich_text, context)}</h2>;
     case "heading_3":
       if (block.has_children) {
         console.warn(`block type ${block.type} with children not implemented`);
       }
+      const slug3 = slugify(block.heading_3.rich_text);
+      return (
+        <h3 id={slug3}>
+          <a href={"#" + slug3} className={css.heading}>
+            {renderRichText(block.heading_3.rich_text, context)}
+          </a>
+        </h3>
+      );
 
-      return <h3>{renderRichText(block.heading_3.rich_text, context)}</h3>;
     case "bulleted_list_item":
       return (
         <li>

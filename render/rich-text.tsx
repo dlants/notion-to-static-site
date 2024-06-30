@@ -48,6 +48,23 @@ export function renderRichTextToPlainText(richText: RichTextItemResponse[]) {
   return richText.map((item) => item.plain_text).join();
 }
 
+const slugMap: { [slug: string]: true } = {};
+export function slugify(richText: RichTextItemResponse[]) {
+  const text = renderRichTextToPlainText(richText)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-");
+
+  const slugBase = text.slice(0, 50);
+  let slug = slugBase;
+  let counter = 0;
+  while (slugMap[slug]) {
+    slug = slugBase + "_" + counter;
+    counter += 1;
+  }
+
+  slugMap[slug] = true;
+  return slug;
+}
 export function renderRichTextContents(
   richText: RichTextItemResponse[],
   context: RenderContext,
