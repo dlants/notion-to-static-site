@@ -161,8 +161,6 @@ export function renderBlocks(
       default:
         assertUnreachable(currentChunk);
     }
-
-    currentChunk = undefined;
   }
 
   while (true) {
