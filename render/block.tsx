@@ -268,8 +268,8 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
       }
       const slug3 = slugify(block.heading_3.rich_text);
       return (
-        <h3 id={slug3}>
-          <a href={"#" + slug3} className={css.heading}>
+        <h3 id={slug3} className={css.heading}>
+          <a href={"#" + slug3}>
             {renderRichText(block.heading_3.rich_text, context)}
           </a>
         </h3>
