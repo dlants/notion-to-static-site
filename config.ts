@@ -49,13 +49,6 @@ export type SiteConfig = {
   /** For verifying your mastodon identity.
    */
   mastodonHref: string;
-
-  /** for a goatCounter analytics
-   */
-  goatCounter?: {
-    scriptData: string;
-    scriptSrc: string;
-  };
 };
 
 export const siteConfig: SiteConfig = {
@@ -74,8 +67,4 @@ export const siteConfig: SiteConfig = {
   faviconPath: "static/black-rectangle.svg",
   publishDatePropertyName: "Publish Date",
   shortUrlPropertyName: "short-url",
-  goatCounter: {
-    scriptData: "https://goatcounter-e1un.onrender.com/count",
-    scriptSrc: "//goatcounter-e1un.onrender.com/count.js",
-  },
 };
