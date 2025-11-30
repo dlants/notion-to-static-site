@@ -6,6 +6,7 @@ import {
   getPagePublishDateProperty,
   getFilePath,
   getPageShortUrl,
+  getAdjacentPosts,
 } from "../util";
 import fs from "fs";
 import path from "path";
@@ -19,10 +20,47 @@ import {
 import { renderBlocks } from "./block";
 import { renderHeader } from "./header";
 import { pageLayout } from "./util";
+import { siteConfig } from "../config";
 
 // see https://typestyle.github.io/#/page
 csstips.normalize();
 csstips.setupPage("#root");
+
+function renderPostNavigation(page: PageWithChildren, context: BaseRenderContext) {
+  const { previous, next } = getAdjacentPosts(page, siteConfig.rootDatabaseId, context);
+
+  if (!previous && !next) {
+    return undefined;
+  }
+
+  return (
+    <div style={{
+      marginTop: '3em',
+      paddingTop: '1em',
+      borderTop: '1px solid #ddd',
+      display: 'flex',
+      justifyContent: 'space-between',
+      fontSize: '0.9em'
+    }}>
+      <div style={{ flex: 1 }}>
+        {previous && (
+          <div>
+            <div style={{ color: '#666', marginBottom: '0.25em' }}>← Previous</div>
+            {pageLink(previous, context)}
+          </div>
+        )}
+      </div>
+      <div style={{ flex: 1, textAlign: 'right' }}>
+        {next && (
+          <div>
+            <div style={{ color: '#666', marginBottom: '0.25em' }}>Next →</div>
+            {pageLink(next, context)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function renderPage(page: PageWithChildren, context: BaseRenderContext) {
   const pageContext: RenderContext = { ...context, currentPage: page };
@@ -46,6 +84,7 @@ export function renderPage(page: PageWithChildren, context: BaseRenderContext) {
       </div>
     ),
     ...renderBlocks(page.children, pageContext),
+    renderPostNavigation(page, context),
   ];
 
   // for backwards compatibility, render redirect pages for all the old ids

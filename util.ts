@@ -369,3 +369,45 @@ export function getPublishDatePropertyId({
   }
   return propertyId;
 }
+
+export function getAdjacentPosts(
+  currentPage: PageWithChildren,
+  databaseId: DatabaseId,
+  context: BaseRenderContext,
+): { previous?: PageWithChildren; next?: PageWithChildren } {
+  const db = context.dbs[databaseId];
+  const allPages = db.children.map((pageId) => context.pages[pageId]);
+
+  const propertyName = siteConfig.publishDatePropertyName;
+  const propertyId = db.properties[propertyName]?.id;
+
+  if (!propertyId) {
+    return {};
+  }
+
+  // Sort pages by publish date (descending, newest first)
+  const sortedPages = _.chain(allPages)
+    .map((page) => {
+      const publishDateProp = _.find(
+        _.values(page.properties),
+        (prop): prop is DatePageProperty => prop.id == propertyId,
+      );
+      const date = publishDateProp?.date?.start;
+      return { page, date };
+    })
+    .filter(({ date }) => !!date)
+    .sortBy(({ date }) => -1 * new Date(date!).getTime())
+    .map(({ page }) => page)
+    .value();
+
+  const currentIndex = sortedPages.findIndex((p) => p.id === currentPage.id);
+
+  if (currentIndex === -1) {
+    return {};
+  }
+
+  return {
+    next: currentIndex > 0 ? sortedPages[currentIndex - 1] : undefined,
+    previous: currentIndex < sortedPages.length - 1 ? sortedPages[currentIndex + 1] : undefined,
+  };
+}
