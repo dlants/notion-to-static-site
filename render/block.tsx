@@ -4,6 +4,7 @@ import {
   renderRichTextContents,
   pageLink,
   slugify,
+  renderRichTextToPlainText,
 } from "./rich-text";
 import { BlockWithChildren, RenderContext, assertUnreachable } from "../util";
 import { stylesheet, media, extend } from "typestyle";
@@ -133,21 +134,94 @@ const css = stylesheet({
   },
 
   bookmark: {},
+
+  tableOfContents: {
+    ...csstips.vertical,
+    paddingTop: csx.px(10),
+    paddingBottom: csx.px(10),
+    $nest: {
+      ul: {
+        listStyle: "none",
+        paddingLeft: 0,
+      },
+      li: {
+        paddingTop: csx.px(4),
+        paddingBottom: csx.px(4),
+      },
+      a: {
+        color: COLORS.black.toString(),
+        textDecoration: "none",
+        $nest: {
+          "&:hover": {
+            textDecoration: "underline",
+          },
+        },
+      },
+    },
+  },
 });
 
 type Chunk =
   | {
-      type: "singleBlock";
-      block: BlockWithChildren;
-    }
+    type: "singleBlock";
+    block: BlockWithChildren;
+  }
   | {
-      type: "numberedList";
-      blocks: BlockWithChildren[];
-    }
+    type: "numberedList";
+    blocks: BlockWithChildren[];
+  }
   | {
-      type: "bulletList";
-      blocks: BlockWithChildren[];
-    };
+    type: "bulletList";
+    blocks: BlockWithChildren[];
+  };
+
+type HeadingInfo = {
+  level: 1 | 2 | 3;
+  text: string;
+  slug: string;
+};
+
+function renderTableOfContents(context: RenderContext) {
+  const headings: HeadingInfo[] = [];
+
+  for (const block of context.currentPage.children) {
+    if (block.type === "heading_1") {
+      headings.push({
+        level: 1,
+        text: renderRichTextToPlainText(block.heading_1.rich_text),
+        slug: slugify(block.heading_1.rich_text),
+      });
+    } else if (block.type === "heading_2") {
+      headings.push({
+        level: 2,
+        text: renderRichTextToPlainText(block.heading_2.rich_text),
+        slug: slugify(block.heading_2.rich_text),
+      });
+    } else if (block.type === "heading_3") {
+      headings.push({
+        level: 3,
+        text: renderRichTextToPlainText(block.heading_3.rich_text),
+        slug: slugify(block.heading_3.rich_text),
+      });
+    }
+  }
+
+  if (headings.length === 0) {
+    return undefined;
+  }
+
+  return (
+    <div className={css.tableOfContents}>
+      <ul>
+        {headings.map((heading, i) => (
+          <li key={i} style={{ paddingLeft: `${(heading.level - 1) * 20}px` }}>
+            <a href={`#${heading.slug}_0`}>{heading.text}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export function renderBlocks(
   blockList: BlockWithChildren[],
@@ -330,9 +404,10 @@ function renderBlock(block: BlockWithChildren, context: RenderContext) {
           <div />
         </div>
       );
+    case "table_of_contents":
+      return renderTableOfContents(context);
     case "callout":
     case "breadcrumb":
-    case "table_of_contents":
     case "link_to_page":
     case "table":
     case "table_row":

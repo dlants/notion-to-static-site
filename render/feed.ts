@@ -2,7 +2,7 @@ import { Feed } from "feed";
 import {
   DatabaseId,
   DatePageProperty,
-  RenderContext,
+  BaseRenderContext,
   getFilePath,
   getPageTitleProperty,
 } from "../util";
@@ -16,7 +16,7 @@ import { siteConfig } from "../config";
 export function renderDbFeed(
   databaseId: DatabaseId,
   options: DbRenderOptions,
-  context: RenderContext,
+  context: BaseRenderContext,
 ) {
   const feed = new Feed({
     title: "dlants.me",

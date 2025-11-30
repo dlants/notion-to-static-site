@@ -4,7 +4,7 @@ import {
   DatabaseWithChildren,
   PageWithChildren,
   MultiSelectPageProperty,
-  RenderContext,
+  BaseRenderContext,
   getFilePath,
   MultiSelectDbProperty,
   Tags,
@@ -76,7 +76,7 @@ export type SortOption = {
 export function renderDbBlock(
   databaseId: DatabaseId,
   options: DbRenderOptions,
-  context: RenderContext,
+  context: BaseRenderContext,
 ) {
   const db = context.dbs[databaseId];
   const { pages } = getPagesForDb(databaseId, options, context);
@@ -96,7 +96,7 @@ export function renderDbBlock(
 export function getPagesForDb(
   databaseId: DatabaseId,
   options: DbRenderOptions,
-  context: RenderContext,
+  context: BaseRenderContext,
 ) {
   const db = context.dbs[databaseId];
   let pages = db.children.map((pageId) => context.pages[pageId]);
@@ -156,7 +156,7 @@ export function getPagesForDb(
   return { pages, tags };
 }
 
-export function renderDbPage(databaseId: DatabaseId, context: RenderContext) {
+export function renderDbPage(databaseId: DatabaseId, context: BaseRenderContext) {
   const db = context.dbs[databaseId];
 
   const header = renderHeader(db, context);
@@ -194,7 +194,7 @@ function getTags(page: PageWithChildren) {
   );
 }
 
-function renderPageRow(page: PageWithChildren, context: RenderContext) {
+function renderPageRow(page: PageWithChildren, context: BaseRenderContext) {
   const tags = getTags(page);
   return (
     <div className={css.dbRow}>

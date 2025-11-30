@@ -88,10 +88,14 @@ export type BlockMap = {
   [blockId: BlockId]: BlockWithChildren;
 };
 
-export type RenderContext = {
+export type BaseRenderContext = {
   pages: PageMap;
   blocks: BlockMap;
   dbs: DatabaseMap;
+};
+
+export type RenderContext = BaseRenderContext & {
+  currentPage: PageWithChildren;
 };
 
 export type AssetInfo = {
@@ -137,17 +141,17 @@ export function generateBlockMap({ pages }: { pages: PageMap }): BlockMap {
 
 export type Breadcrumb =
   | {
-      type: "page";
-      pageId: PageId;
-    }
+    type: "page";
+    pageId: PageId;
+  }
   | {
-      type: "database";
-      databaseId: DatabaseId;
-    };
+    type: "database";
+    databaseId: DatabaseId;
+  };
 
 export function getBreadcrumbs(
   nodeId: PageId | DatabaseId,
-  context: RenderContext,
+  context: BaseRenderContext,
 ): Breadcrumb[] {
   const breadcrumbs: Breadcrumb[] = [];
 
@@ -242,26 +246,26 @@ export type DatePageProperty = SelectProperty<
 
 export type FileLocation =
   | {
-      type: "page";
-      shortUrl: ShortUrl;
-    }
+    type: "page";
+    shortUrl: ShortUrl;
+  }
   | {
-      type: "db";
-      databaseId: DatabaseId;
-    }
+    type: "db";
+    databaseId: DatabaseId;
+  }
   | {
-      type: "tag";
-      tag: TagSiteConfigId;
-    }
+    type: "tag";
+    tag: TagSiteConfigId;
+  }
   | {
-      type: "feed";
-      feedType: "rss" | "atom";
-      tag?: TagSiteConfigId;
-    }
+    type: "feed";
+    feedType: "rss" | "atom";
+    tag?: TagSiteConfigId;
+  }
   | {
-      type: "newsletter";
-      tag?: TagSiteConfigId;
-    };
+    type: "newsletter";
+    tag?: TagSiteConfigId;
+  };
 
 export function getPageTitleProperty(
   page: PageWithChildren,
@@ -282,11 +286,11 @@ export function getPagePublishDateProperty(
   page: PageWithChildren,
 ): DatePageProperty | undefined {
   const publishDateProperty = page.properties[siteConfig.publishDatePropertyName];
-  
+
   if (publishDateProperty && publishDateProperty.type == "date") {
     return publishDateProperty;
   }
-  
+
   return undefined;
 }
 
@@ -355,7 +359,7 @@ export function getPublishDatePropertyId({
   context,
 }: {
   databaseId: DatabaseId;
-  context: RenderContext;
+  context: BaseRenderContext;
 }) {
   const db = context.dbs[databaseId];
   const propertyName = siteConfig.publishDatePropertyName;

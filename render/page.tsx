@@ -1,4 +1,5 @@
 import {
+  BaseRenderContext,
   RenderContext,
   PageWithChildren,
   getPageTitleProperty,
@@ -23,15 +24,16 @@ import { pageLayout } from "./util";
 csstips.normalize();
 csstips.setupPage("#root");
 
-export function renderPage(page: PageWithChildren, context: RenderContext) {
-  const header = renderHeader(page, context);
+export function renderPage(page: PageWithChildren, context: BaseRenderContext) {
+  const pageContext: RenderContext = { ...context, currentPage: page };
+  const header = renderHeader(page, pageContext);
   const titleProperty = getPageTitleProperty(page);
   const publishDateProperty = getPagePublishDateProperty(page);
 
   const content = [
     <h1>
       {titleProperty
-        ? renderRichText(titleProperty.title, context)
+        ? renderRichText(titleProperty.title, pageContext)
         : "[Untitled Page]"}
     </h1>,
     publishDateProperty?.date?.start && (
@@ -43,13 +45,13 @@ export function renderPage(page: PageWithChildren, context: RenderContext) {
         })}
       </div>
     ),
-    ...renderBlocks(page.children, context),
+    ...renderBlocks(page.children, pageContext),
   ];
 
   // for backwards compatibility, render redirect pages for all the old ids
   const redirectHtml = pageLayout({
     header,
-    content: [<h1>Page has moved</h1>, <div>{pageLink(page, context)} </div>],
+    content: [<h1>Page has moved</h1>, <div>{pageLink(page, pageContext)} </div>],
     meta: {
       title: "page has moved",
     },

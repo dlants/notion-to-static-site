@@ -2,7 +2,7 @@ import { SitemapStream, streamToPromise } from "sitemap";
 import { Readable } from "stream";
 import {
   DatabaseId,
-  RenderContext,
+  BaseRenderContext,
   getPublishDatePropertyId,
   DatePageProperty,
   getFilePath,
@@ -19,7 +19,7 @@ export async function renderSitemap({
 }: {
   databaseId: DatabaseId;
   options: DbRenderOptions;
-  context: RenderContext;
+  context: BaseRenderContext;
 }) {
   const links = [];
   const publishDatePropertyId = getPublishDatePropertyId({

@@ -1,7 +1,7 @@
 import { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
 import * as React from "react";
 import {
-  RenderContext,
+  BaseRenderContext,
   assertUnreachable,
   PageWithChildren,
   DatabaseWithChildren,
@@ -35,7 +35,7 @@ const css = stylesheet({
 
 export function renderRichText(
   richText: RichTextItemResponse[],
-  context: RenderContext,
+  context: BaseRenderContext,
 ) {
   return (
     <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
@@ -67,14 +67,14 @@ export function slugify(richText: RichTextItemResponse[]) {
 }
 export function renderRichTextContents(
   richText: RichTextItemResponse[],
-  context: RenderContext,
+  context: BaseRenderContext,
 ) {
   return richText.map((item) => renderRichTextElement(item, context));
 }
 
 function renderRichTextElement(
   item: RichTextItemResponse,
-  context: RenderContext,
+  context: BaseRenderContext,
 ) {
   let content;
   switch (item.type) {
@@ -151,7 +151,7 @@ function getStyle(
   return properties;
 }
 
-export function pageLink(page: PageWithChildren, context: RenderContext) {
+export function pageLink(page: PageWithChildren, context: BaseRenderContext) {
   const title = _.find(
     _.values(page.properties),
     (p): p is TitlePageProperty => p.type == "title",
@@ -177,7 +177,7 @@ export function pageLink(page: PageWithChildren, context: RenderContext) {
   );
 }
 
-export function databaseLink(db: DatabaseWithChildren, context: RenderContext) {
+export function databaseLink(db: DatabaseWithChildren, context: BaseRenderContext) {
   return (
     <a
       className={css.pageLink}

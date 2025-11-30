@@ -1,5 +1,5 @@
 import { siteConfig } from "../config";
-import { RenderContext, TagId, TagSiteConfigId, getFilePath } from "../util";
+import { BaseRenderContext, TagId, TagSiteConfigId, getFilePath } from "../util";
 import { renderDbBlock } from "./database";
 import { renderHeader } from "./header";
 import { pageLayout } from "./util";
@@ -23,7 +23,7 @@ const css = stylesheet({
 export function renderTagPage(
   tagId: TagId,
   tagSiteConfigId: TagSiteConfigId,
-  context: RenderContext,
+  context: BaseRenderContext,
 ) {
   const db = context.dbs[siteConfig.rootDatabaseId];
   const header = renderHeader(db, context);

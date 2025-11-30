@@ -2,7 +2,7 @@ import {
   DatabaseMap,
   PageMap,
   PageWithChildren,
-  RenderContext,
+  BaseRenderContext,
   generateBlockMap,
   walkChildrenBFS,
 } from "./util";
@@ -10,7 +10,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { DatabaseObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
-export async function loadPages(rootPageId: string): Promise<RenderContext> {
+export async function loadPages(rootPageId: string): Promise<BaseRenderContext> {
   const pages: PageMap = {};
   const dbs: DatabaseMap = {};
 
@@ -66,7 +66,7 @@ function remapId({
 }: {
   oldPageId: string;
   newPageId: string;
-  context: RenderContext;
+  context: BaseRenderContext;
 }) {
   for (const pageId in context.pages) {
     const page = context.pages[pageId];

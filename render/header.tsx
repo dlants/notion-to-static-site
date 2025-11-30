@@ -1,5 +1,5 @@
 import {
-  RenderContext,
+  BaseRenderContext,
   getBreadcrumbs,
   PageWithChildren,
   assertUnreachable,
@@ -83,7 +83,7 @@ const css = stylesheet({
 
 export function renderHeader(
   node: PageWithChildren | DatabaseWithChildren | undefined,
-  context: RenderContext,
+  context: BaseRenderContext,
 ) {
   const breadcrumbs = node ? getBreadcrumbs(node.id, context) : undefined;
   const sectionPages = siteConfig.headerPageIds.map(normalizePageId);

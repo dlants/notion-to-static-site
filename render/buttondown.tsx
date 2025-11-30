@@ -1,7 +1,7 @@
 import { renderToString } from "react-dom/server";
 import * as React from "react";
 import {
-  RenderContext,
+  BaseRenderContext,
   Tag,
   TagSiteConfigId,
   getFilePath,
@@ -53,7 +53,7 @@ const css = stylesheet({
   },
 });
 
-export function renderButtondown(context: RenderContext) {
+export function renderButtondown(context: BaseRenderContext) {
   const db = context.dbs[normalizePageId(siteConfig.rootDatabaseId)];
 
   // buttondown to sign up for everything
@@ -69,7 +69,7 @@ export function renderButtondown(context: RenderContext) {
 
 function renderButtondownPage(
   tag: (Tag & { tagSiteConfigId: TagSiteConfigId }) | undefined,
-  context: RenderContext,
+  context: BaseRenderContext,
 ) {
   const pageContent = renderToString(
     <div className={css.page}>
