@@ -16,7 +16,7 @@ dotenv.config();
 
 yargs
   .command(
-    "serve ",
+    "serve",
     "serve the site locally",
     (yargs) => {
       yargs.option("port", {
