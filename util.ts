@@ -278,6 +278,19 @@ export function getPageTitleProperty(
   return page.properties["title"] as TitlePageProperty;
 }
 
+export function getPagePublishDateProperty(
+  page: PageWithChildren,
+): DatePageProperty | undefined {
+  const publishDateProperty = page.properties[siteConfig.publishDatePropertyName];
+  
+  if (publishDateProperty && publishDateProperty.type == "date") {
+    return publishDateProperty;
+  }
+  
+  return undefined;
+}
+
+
 export function getFilePath(loc: FileLocation): string {
   switch (loc.type) {
     case "page":

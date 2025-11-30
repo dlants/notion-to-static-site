@@ -2,6 +2,7 @@ import {
   RenderContext,
   PageWithChildren,
   getPageTitleProperty,
+  getPagePublishDateProperty,
   getFilePath,
   getPageShortUrl,
 } from "../util";
@@ -25,12 +26,23 @@ csstips.setupPage("#root");
 export function renderPage(page: PageWithChildren, context: RenderContext) {
   const header = renderHeader(page, context);
   const titleProperty = getPageTitleProperty(page);
+  const publishDateProperty = getPagePublishDateProperty(page);
+
   const content = [
     <h1>
       {titleProperty
         ? renderRichText(titleProperty.title, context)
         : "[Untitled Page]"}
     </h1>,
+    publishDateProperty?.date?.start && (
+      <div style={{ color: '#666', fontSize: '0.9em', marginBottom: '1em' }}>
+        {new Date(publishDateProperty.date.start).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })}
+      </div>
+    ),
     ...renderBlocks(page.children, context),
   ];
 
